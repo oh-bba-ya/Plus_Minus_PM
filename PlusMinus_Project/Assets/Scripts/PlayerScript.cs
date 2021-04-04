@@ -10,6 +10,7 @@ public class PlayerScript : MonoBehaviour
     public int[] CardInfo = new int[3]; //->int[,] index = { { -1, -1, -1 }, { -1, -1, -1 }, { -1, -1, -1 }, { -1, -1, -1 }, { -1, -1, -1 } }; player별로 쪼갠거
     public int money = 10000;
     public bool isDead = false;
+    public int deadturn = 0;
     
     // Start is called before the first frame update
 

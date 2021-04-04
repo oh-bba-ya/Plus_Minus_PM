@@ -38,6 +38,7 @@ public class GameManager_GM : MonoBehaviour
     public Button CallBtn;
 
     int turn = 0;
+    int chapter = 1;
     
     int startturn;
     private int totalmoney = 0;
@@ -76,6 +77,10 @@ public class GameManager_GM : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if(turn%curPlayer == chapter)
+        {
+            chapter++;
+        }
     }
 
 
@@ -305,16 +310,64 @@ public class GameManager_GM : MonoBehaviour
 
     private void OnClickDieBtn()
     {
-        throw new System.NotImplementedException();
+        players[turn % curPlayer].isDead = true;
+        players[turn % curPlayer].deadturn = turn;
+        players[turn % curPlayer].gameObject.SetActive(false);
+        //머니 로그는 다른 함수들에서 실행.
     }
 
     private void OnClickHalfBtn()
     {
-        throw new System.NotImplementedException();
+        if (players[(turn - 1) % curPlayer].isDead)
+        {
+            if (players[(turn - 1)].deadturn % curPlayer < chapter)
+            {//같은 턴에서 죽은 사람
+                MoneyLog.Add(0);
+            }
+            else if (players[(turn - 1)].deadturn % curPlayer > chapter)
+            {
+                //이미 죽어있는 상태면 그 유저 무시
+                MoneyLog.Add(MoneyLog[turn - 1]);
+                turn++;
+            }
+        }
+        if (turn > 0)
+        {
+            players[turn % curPlayer].money -= MoneyLog[turn - 1]; //전 사람이 낸만큼 먼저 냄
+            totalmoney += MoneyLog[turn - 1];
+            int half = totalmoney / 2;
+            players[turn % curPlayer].money -= half; //그 후 전체 금액의 1/4
+            totalmoney += half;
+
+            MoneyLog.Add(MoneyLog[turn - 1] + half);
+            turn++;
+
+        }
+
+        else
+        {
+            Debug.Log("선택 불가");
+        }
+
+        Debug.Log("턴: " + turn + "총 금액 : " + totalmoney + "전 사람 금액 : " + MoneyLog[turn - 2]);
     }
 
     private void OnClickQuaterBtn()
     {
+        if (players[(turn - 1) % curPlayer].isDead)
+        {
+            if (players[(turn - 1)].deadturn % curPlayer < chapter)
+            {//같은 턴에서 죽은 사람
+                MoneyLog.Add(0);
+            }
+            else if (players[(turn - 1)].deadturn % curPlayer > chapter)
+            {
+                //이미 죽어있는 상태면 그 유저 무시
+                MoneyLog.Add(MoneyLog[turn - 1]);
+                turn++;
+            }
+        }
+
         if (turn > 0)
         {
             players[turn % curPlayer].money -= MoneyLog[turn - 1]; //전 사람이 낸만큼 먼저 냄
@@ -339,7 +392,19 @@ public class GameManager_GM : MonoBehaviour
 
     private void OnClickDoubleBtn()
     {
-        
+        if (players[(turn - 1) % curPlayer].isDead)
+        {
+            if (players[(turn - 1)].deadturn % curPlayer < chapter)
+            {//같은 턴에서 죽은 사람
+                MoneyLog.Add(0);
+            }
+            else if (players[(turn - 1)].deadturn % curPlayer > chapter)
+            {
+                //이미 죽어있는 상태면 그 유저 무시
+                MoneyLog.Add(MoneyLog[turn - 1]);
+                turn++;
+            }
+        }
         if (turn > 0)
         {
             players[turn % curPlayer].money -= 2 * MoneyLog[turn - 1];
@@ -357,7 +422,7 @@ public class GameManager_GM : MonoBehaviour
 
     private void OnClickFirstBtn()
     {
-        if(turn == 0)
+        if(turn%curPlayer== (chapter-1))
         {
             MoneyLog.Add(Min);
             players[turn % curPlayer].money -= MoneyLog[turn];

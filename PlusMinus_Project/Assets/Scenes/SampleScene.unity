@@ -1165,6 +1165,7 @@ MonoBehaviour:
   CardInfo: 000000000000000000000000
   money: 10000
   isDead: 0
+  deadturn: 0
 --- !u!1 &678544364
 GameObject:
   m_ObjectHideFlags: 0
@@ -1338,6 +1339,7 @@ MonoBehaviour:
   CardInfo: 000000000000000000000000
   money: 10000
   isDead: 0
+  deadturn: 0
 --- !u!1 &744611815
 GameObject:
   m_ObjectHideFlags: 0
@@ -1918,6 +1920,7 @@ MonoBehaviour:
   CardInfo: 000000000000000000000000
   money: 10000
   isDead: 0
+  deadturn: 0
 --- !u!1 &1304203807
 GameObject:
   m_ObjectHideFlags: 0
@@ -2053,6 +2056,7 @@ MonoBehaviour:
   CardInfo: 000000000000000000000000
   money: 10000
   isDead: 0
+  deadturn: 0
 --- !u!1 &1394428838
 GameObject:
   m_ObjectHideFlags: 0
@@ -2085,11 +2089,11 @@ RectTransform:
   m_Children:
   - {fileID: 1701354812}
   m_Father: {fileID: 1680560784}
-  m_RootOrder: 4
+  m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 330, y: -579}
+  m_AnchoredPosition: {x: 653, y: -579}
   m_SizeDelta: {x: 300, y: 200}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1394428840
@@ -2308,6 +2312,7 @@ MonoBehaviour:
   CardInfo: 000000000000000000000000
   money: 10000
   isDead: 0
+  deadturn: 0
 --- !u!1 &1449834255
 GameObject:
   m_ObjectHideFlags: 0
@@ -2744,11 +2749,11 @@ RectTransform:
   m_Children:
   - {fileID: 1931817370}
   m_Father: {fileID: 1680560784}
-  m_RootOrder: 5
+  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 658, y: -579}
+  m_AnchoredPosition: {x: 335, y: -579}
   m_SizeDelta: {x: 300, y: 200}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1603958605
@@ -3139,8 +3144,8 @@ RectTransform:
   - {fileID: 785927955}
   - {fileID: 678544365}
   - {fileID: 2138460523}
-  - {fileID: 1394428839}
   - {fileID: 1603958604}
+  - {fileID: 1394428839}
   - {fileID: 1804213274}
   m_Father: {fileID: 0}
   m_RootOrder: 2
