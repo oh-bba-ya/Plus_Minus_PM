@@ -6,7 +6,7 @@ using UnityEngine.UI;
 public class GameManager_GM : MonoBehaviour
 {
     
-    public int[,] arrPlayer = { { -1, -1, -1 }, { -1, -1, -1 }, { -1, -1, -1 }, { -1, -1, -1 }, { -1, -1, -1 } };            // [ total 참여 가능한 플레이어의  수 , total 받을 수 있는 카드의 수 ]  
+    //public int[,] arrPlayer = { { -1, -1, -1 }, { -1, -1, -1 }, { -1, -1, -1 }, { -1, -1, -1 }, { -1, -1, -1 } };            // [ total 참여 가능한 플레이어의  수 , total 받을 수 있는 카드의 수 ]  
     public int curPlayer = 5;
     public Sprite[] cards;                  // cards[0] = 카드 뒷면.
 
@@ -19,7 +19,7 @@ public class GameManager_GM : MonoBehaviour
     */
 
     public PlayerScript[] players;
-
+    int CardInfoLoop = 1;
     private int checkCount = 0;
 
     private bool isDistribute = false;
@@ -43,8 +43,10 @@ public class GameManager_GM : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        Shuffle();
         DistributeCard(curPlayer);
-        //StartCoroutine("ClickCard", player03);
+        StartCoroutine("ClickCard", 2);
+
 
         //클릭시 함수 호출하는 이벤트 트리거
         FirstBtn.onClick.AddListener(() => OnClickFirstBtn());
@@ -78,47 +80,14 @@ public class GameManager_GM : MonoBehaviour
             players[i].SetPlayerCard(cards, 0, 0);
             players[i].SetPlayerCard(cards, 1, 0);
             players[i].SetPlayerCard(cards, 2, 0);
-            /*
-            for(int j = 0; j < 3; j++)
-            {
-                switch (i)
-                {
-                    case 0:
-                        player01[0].GetComponent<SpriteRenderer>().sprite = cards[0];
-                        player01[1].GetComponent<SpriteRenderer>().sprite = cards[0];
-                        player01[2].GetComponent<SpriteRenderer>().sprite = cards[0];
-                        break;
-                    case 1:
-                        player02[0].GetComponent<SpriteRenderer>().sprite = cards[0];
-                        player02[1].GetComponent<SpriteRenderer>().sprite = cards[0];
-                        player02[2].GetComponent<SpriteRenderer>().sprite = cards[0];
-                        break;
-                    case 2:
-                        player03[0].GetComponent<SpriteRenderer>().sprite = cards[0];
-                        player03[1].GetComponent<SpriteRenderer>().sprite = cards[0];
-                        player03[2].GetComponent<SpriteRenderer>().sprite = cards[0];
-                        break;
-                    case 3:
-                        player04[0].GetComponent<SpriteRenderer>().sprite = cards[0];
-                        player04[1].GetComponent<SpriteRenderer>().sprite = cards[0];
-                        player04[2].GetComponent<SpriteRenderer>().sprite = cards[0];
-                        break;
-                    case 4:
-                        player05[0].GetComponent<SpriteRenderer>().sprite = cards[0];
-                        player05[1].GetComponent<SpriteRenderer>().sprite = cards[0];
-                        player05[2].GetComponent<SpriteRenderer>().sprite = cards[0];
-                        break;
-
-                }
-            }
-         */
         }
 
         
         isDistribute = true;
         if (isDistribute)
         {
-            Playerallocation(curPlayer, RandomCardIndex(curPlayer));
+            PlayerCardAllocation();
+            //Playerallocation(curPlayer, RandomCardIndex(curPlayer));
         }
         
     }
@@ -128,7 +97,7 @@ public class GameManager_GM : MonoBehaviour
     /// </summary>
     void StartCheckCard()
     {
-        //StartCoroutine("ClickCard",player03);
+        StartCoroutine("ClickCard",2);
     }
 
     /// <summary>
@@ -136,7 +105,7 @@ public class GameManager_GM : MonoBehaviour
     /// </summary>
     void StopCheckCard()
     {
-        //StopCoroutine("ClickCard");
+        StopCoroutine("ClickCard");
     }
 
     /// <summary>
@@ -144,16 +113,20 @@ public class GameManager_GM : MonoBehaviour
     /// </summary>
     /// <param name="myplayer"> 본인 카드 배열 입력 ( player01 ~ 05 중에서 )  </param>
     /// <returns></returns>
-    /*
-    IEnumerator ClickCard(GameObject[] myplayer )
+    IEnumerator ClickCard(int select )
     {
         Vector3[] myCardPos = new Vector3[3];
+        myCardPos[0] = players[select].handcard[0].transform.position; //left
+        myCardPos[1] = players[select].handcard[1].transform.position; //center
+        myCardPos[2] = players[select].handcard[2].transform.position;//right
+
         int[] playerCard = new int[3];
-        myCardPos[0] = myplayer[0].transform.position;          // leftCard.
-        myCardPos[1] = myplayer[1].transform.position;          // centerCard.
-        myCardPos[2] = myplayer[2].transform.position;          // rightCard.
 
-
+        for(int i = 0; i < 3; i++)
+        {
+            playerCard[i] = players[select].CardInfo[i];
+        }
+        /*
     // 파라미터로 입력받은 게임오브젝트 배열이 player01~05 중에서 어떤 것인지 확인 후 맞는 플레이어 카드 인덱스 번호 넣어줌.
     if(myCardPos[0] == player01[0].transform.position)
     {
@@ -190,7 +163,7 @@ public class GameManager_GM : MonoBehaviour
             playerCard[i] = arrPlayer[4, i];
         }
     }
-
+        */
     while (checkCount < 1)
     {
         if (Input.GetMouseButton(0))
@@ -202,35 +175,57 @@ public class GameManager_GM : MonoBehaviour
                 Vector3 touchObj = hitInpo.transform.position; // 터치한 카드 오브젝트 위치.
                 if (touchObj == myCardPos[0])
                 {
-                    myplayer[0].GetComponent<SpriteRenderer>().sprite = cards[playerCard[0]];
+                    players[select].handcard[0].GetComponent<SpriteRenderer>().sprite = cards[playerCard[0]];
                     isCheckCard = true;
                     checkCount = 1;
                 }
                 else if (touchObj == myCardPos[1])
                 {
-                    myplayer[1].GetComponent<SpriteRenderer>().sprite = cards[playerCard[1]];
+                    players[select].handcard[1].GetComponent<SpriteRenderer>().sprite = cards[playerCard[1]];
                     isCheckCard = true;
                     checkCount = 1;
                 }
                 else if (touchObj == myCardPos[2])
                 {
-                    myplayer[2].GetComponent<SpriteRenderer>().sprite = cards[playerCard[2]];
+                    players[select].handcard[2].GetComponent<SpriteRenderer>().sprite = cards[playerCard[2]];
                     isCheckCard = true;
                     checkCount = 1;
                 }
-
             }
-
-
         }
         yield return new WaitForSeconds(0.05f);             // While 루프 내부를 0.05초마다 실행.
     }
-
-    
 }
 
-    */
 
+
+
+    void Shuffle()
+    {
+        for (int i = cards.Length - 1; i > 1; --i)
+        {
+            int j = Random.Range(1, cards.Length - 1);
+            Sprite temp = cards[i];
+            cards[i] = cards[j];
+            cards[j] = temp;
+        }
+    }
+
+    void PlayerCardAllocation()
+    {
+        for(int i = 0; i < curPlayer; i++)
+        {
+            players[i].CardInfo[0] = CardInfoLoop;
+            CardInfoLoop++;
+            players[i].CardInfo[1] = CardInfoLoop;
+            CardInfoLoop++;
+            players[i].CardInfo[2] = CardInfoLoop;
+            CardInfoLoop++;
+            Debug.Log(cards[players[i].CardInfo[0]].name + ", " + cards[players[i].CardInfo[1]].name + ", " + cards[players[i].CardInfo[2]].name);
+        }
+    }
+
+    /*
     /// <summary>
     /// 플레이어 인원수 만큼 RandomCardIndex를 통해 반한된 2차원 배열을 플레이어 에게 저장함.
     /// </summary>
@@ -250,15 +245,13 @@ public class GameManager_GM : MonoBehaviour
     }
 }
 
-
-
-/// <summary>
-/// 스프라이트 카드 랜덤 인덱스 생성 ( 중복 제거)
-/// 여기서 인덱스를 입력받아 각 플레이어에게 인덱스에 맞춰서 카드를 결정해줌.
-/// </summary>
-/// <param name="in_player"> 현재 참가한 게임 인원.</param> 
-/// <returns></returns>
-int[,] RandomCardIndex(int in_player)
+    /// <summary>
+    /// 스프라이트 카드 랜덤 인덱스 생성 ( 중복 제거)
+    /// 여기서 인덱스를 입력받아 각 플레이어에게 인덱스에 맞춰서 카드를 결정해줌.
+    /// </summary>
+    /// <param name="in_player"> 현재 참가한 게임 인원.</param> 
+    /// <returns></returns>
+    int[,] RandomCardIndex(int in_player)
 {
     List<int> rand = new List<int>();
     int randnumber = Random.Range(1,53);
@@ -289,6 +282,8 @@ int[,] RandomCardIndex(int in_player)
     }
     return index;
 }
+    */
+
 
 
 

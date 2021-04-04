@@ -6,8 +6,10 @@ public class PlayerScript : MonoBehaviour
 {
     public GameObject[] handcard;
 
+    //CardInfo : 진짜 카드 sprite정보에 접근하기 위한 index.
+    public int[] CardInfo = new int[3]; //->int[,] index = { { -1, -1, -1 }, { -1, -1, -1 }, { -1, -1, -1 }, { -1, -1, -1 }, { -1, -1, -1 } }; player별로 쪼갠거
     public int money = 10000;
-    public int hand = 0;
+    
     // Start is called before the first frame update
 
 
