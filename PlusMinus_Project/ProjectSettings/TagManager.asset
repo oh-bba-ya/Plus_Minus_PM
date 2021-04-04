@@ -1,0 +1,63 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!78 &1
+TagManager:
+  serializedVersion: 2
+  tags:
+  - player01_left
+  - player01_center
+  - player01_right
+  - player02_left
+  - player02_center
+  - player02_right
+  - player03_left
+  - player03_center
+  - player03_right
+  - player01
+  - player02
+  - player03
+  - player04
+  - player05
+  - player04_left
+  - player04_center
+  - player04_right
+  - player05_left
+  - player05_center
+  - player05_right
+  layers:
+  - Default
+  - TransparentFX
+  - Ignore Raycast
+  - 
+  - Water
+  - UI
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  m_SortingLayers:
+  - name: Default
+    uniqueID: 0
+    locked: 0
