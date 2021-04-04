@@ -10,13 +10,15 @@ public class GameManager_GM : MonoBehaviour
     public int curPlayer = 5;
     public Sprite[] cards;                  // cards[0] = 카드 뒷면.
 
-    
+    /*
     public GameObject[] player01 = new GameObject[3];
     public GameObject[] player02 = new GameObject[3];
     public GameObject[] player03 = new GameObject[3];
     public GameObject[] player04 = new GameObject[3];
     public GameObject[] player05 = new GameObject[3];
-    
+    */
+
+    public PlayerScript[] players;
 
     private int checkCount = 0;
 
@@ -42,7 +44,7 @@ public class GameManager_GM : MonoBehaviour
     void Start()
     {
         DistributeCard(curPlayer);
-        StartCoroutine("ClickCard", player03);
+        //StartCoroutine("ClickCard", player03);
 
         //클릭시 함수 호출하는 이벤트 트리거
         FirstBtn.onClick.AddListener(() => OnClickFirstBtn());
@@ -72,6 +74,11 @@ public class GameManager_GM : MonoBehaviour
 
         for(int i = 0; i < in_player; i++)
         {
+            //cardback으로 먼저 설정하기.
+            players[i].SetPlayerCard(cards, 0, 0);
+            players[i].SetPlayerCard(cards, 1, 0);
+            players[i].SetPlayerCard(cards, 2, 0);
+            /*
             for(int j = 0; j < 3; j++)
             {
                 switch (i)
@@ -104,7 +111,7 @@ public class GameManager_GM : MonoBehaviour
 
                 }
             }
-            
+         */
         }
 
         
@@ -137,6 +144,7 @@ public class GameManager_GM : MonoBehaviour
     /// </summary>
     /// <param name="myplayer"> 본인 카드 배열 입력 ( player01 ~ 05 중에서 )  </param>
     /// <returns></returns>
+    /*
     IEnumerator ClickCard(GameObject[] myplayer )
     {
         Vector3[] myCardPos = new Vector3[3];
@@ -218,17 +226,17 @@ public class GameManager_GM : MonoBehaviour
         yield return new WaitForSeconds(0.05f);             // While 루프 내부를 0.05초마다 실행.
     }
 
-
+    
 }
 
+    */
 
-
-/// <summary>
-/// 플레이어 인원수 만큼 RandomCardIndex를 통해 반한된 2차원 배열을 플레이어 에게 저장함.
-/// </summary>
-/// <param name="in_player"> 현재 참여한 플레이어의 숫자를 입력 받음.</param> 
-/// <param name="index"> GameManager_GM 스크립트에 저장된 카드 스프라이트 인덱스를 RandomCardIndex 함수로 부터 return 한 index를 입력받음.</param> 
-void Playerallocation(int in_player,int[,] index)
+    /// <summary>
+    /// 플레이어 인원수 만큼 RandomCardIndex를 통해 반한된 2차원 배열을 플레이어 에게 저장함.
+    /// </summary>
+    /// <param name="in_player"> 현재 참여한 플레이어의 숫자를 입력 받음.</param> 
+    /// <param name="index"> GameManager_GM 스크립트에 저장된 카드 스프라이트 인덱스를 RandomCardIndex 함수로 부터 return 한 index를 입력받음.</param> 
+    void Playerallocation(int in_player,int[,] index)
 {
     for(int i = 0; i < 5; i++)
     {
