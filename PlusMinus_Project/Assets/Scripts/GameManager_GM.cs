@@ -5,11 +5,13 @@ using UnityEngine.UI;
 
 public class GameManager_GM : MonoBehaviour
 {
-    
+
+    //****playerscript로 이동
     //public int[,] arrPlayer = { { -1, -1, -1 }, { -1, -1, -1 }, { -1, -1, -1 }, { -1, -1, -1 }, { -1, -1, -1 } };            // [ total 참여 가능한 플레이어의  수 , total 받을 수 있는 카드의 수 ]  
     public int curPlayer = 5;
     public Sprite[] cards;                  // cards[0] = 카드 뒷면.
 
+    //****playerscript로 이동
     /*
     public GameObject[] player01 = new GameObject[3];
     public GameObject[] player02 = new GameObject[3];
@@ -136,6 +138,8 @@ public class GameManager_GM : MonoBehaviour
         {
             playerCard[i] = players[select].CardInfo[i];
         }
+
+        //****playerscript로 이동
         /*
     // 파라미터로 입력받은 게임오브젝트 배열이 player01~05 중에서 어떤 것인지 확인 후 맞는 플레이어 카드 인덱스 번호 넣어줌.
     if(myCardPos[0] == player01[0].transform.position)
@@ -174,7 +178,7 @@ public class GameManager_GM : MonoBehaviour
         }
     }
         */
-    while (checkCount < 1)
+        while (checkCount < 1)
     {
         if (Input.GetMouseButton(0))
         {
@@ -222,6 +226,7 @@ public class GameManager_GM : MonoBehaviour
             CardInfoLoop++;
             players[i].CardInfo[2] = CardInfoLoop;
             CardInfoLoop++;
+
             Debug.Log("Player"+i+1+": "+cards[players[i].CardInfo[0]].name + ", " + cards[players[i].CardInfo[1]].name + ", " + cards[players[i].CardInfo[2]].name);
         }
     }
@@ -310,17 +315,35 @@ public class GameManager_GM : MonoBehaviour
 
     private void OnClickQuaterBtn()
     {
-        throw new System.NotImplementedException();
+        if (turn > 0)
+        {
+            players[turn % curPlayer].money -= MoneyLog[turn - 1]; //전 사람이 낸만큼 먼저 냄
+            totalmoney += MoneyLog[turn-1];
+            int quarter = totalmoney / 4;
+            players[turn % curPlayer].money -= quarter; //그 후 전체 금액의 1/4
+            totalmoney += quarter;
+
+            MoneyLog.Add(MoneyLog[turn - 1] + quarter);
+            turn++;
+            
+        }
+
+        else
+        {
+            Debug.Log("선택 불가");
+        }
+
+        Debug.Log("턴: " + turn + "총 금액 : " + totalmoney + "전 사람 금액 : " + MoneyLog[turn - 2]);
 
     }
 
     private void OnClickDoubleBtn()
     {
-        int previous = turn - 1;
-        if (turn >= 1)
+        
+        if (turn > 0)
         {
-            players[(previous + 1) % curPlayer].money -= 2 * MoneyLog[previous];
-            MoneyLog.Add(2 * MoneyLog[previous]);
+            players[turn % curPlayer].money -= 2 * MoneyLog[turn - 1];
+            MoneyLog.Add(2 * MoneyLog[turn - 1]);
             totalmoney += MoneyLog[turn];
             turn++;
         }
@@ -328,8 +351,8 @@ public class GameManager_GM : MonoBehaviour
         {
             Debug.Log("선택 불가");
         }
+        Debug.Log("턴: " + turn + "총 금액 : " + totalmoney + "전 사람 금액 : " + MoneyLog[turn - 2]);
 
-        Debug.Log("턴: " + turn + "총 금액 : " + totalmoney + "전 사람 금액 : " + MoneyLog[previous]);
     }
 
     private void OnClickFirstBtn()
@@ -337,7 +360,7 @@ public class GameManager_GM : MonoBehaviour
         if(turn == 0)
         {
             MoneyLog.Add(Min);
-            players[0].money -= MoneyLog[turn];
+            players[turn % curPlayer].money -= MoneyLog[turn];
             totalmoney += MoneyLog[turn];
             turn++;
         }
