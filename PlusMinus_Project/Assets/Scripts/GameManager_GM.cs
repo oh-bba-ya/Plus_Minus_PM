@@ -54,13 +54,8 @@ public class GameManager_GM : MonoBehaviour
         DistributeCard(curPlayer);
         StartCoroutine("ClickCard", 2);
 
-        startturn = Random.Range(0, curPlayer-1); // 시작지점 랜덤 지정 (구현 예정)
+        BettingStart();
 
-        for(int i = 0; i < curPlayer; i++)
-        {
-            players[i].money -= startmoney;
-            totalmoney += startmoney;
-        }
         //클릭시 함수 호출하는 이벤트 트리거
         FirstBtn.onClick.AddListener(() => OnClickFirstBtn());
         DoubleBtn.onClick.AddListener(() => OnClickDoubleBtn());
@@ -83,7 +78,19 @@ public class GameManager_GM : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// 게임 시작시 모든 인원에게서 초기 베팅비를 가져옴.
+    /// </summary>
+    void BettingStart()
+    {
+        startturn = Random.Range(0, curPlayer - 1); // 시작지점 랜덤 지정 (구현 예정)
 
+        for (int i = 0; i < curPlayer; i++)
+        {
+            players[i].money -= startmoney;
+            totalmoney += startmoney;
+        }
+    }
     /// <summary>
     /// 게임 시작시 참가한 인원 만큼 카드를 나눠줌.
     /// </summary>
@@ -184,32 +191,34 @@ public class GameManager_GM : MonoBehaviour
     }
         */
         while (checkCount < 1)
-    {
-        if (Input.GetMouseButton(0))
         {
-            Vector2 touchPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-            RaycastHit2D hitInpo = Physics2D.Raycast(touchPos, Camera.main.transform.forward);
-            if(hitInpo.collider != null && (hitInpo.transform.position == myCardPos[0] || hitInpo.transform.position == myCardPos[1] || hitInpo.transform.position == myCardPos[2]))
+            if (Input.GetMouseButton(0))
             {
-                Vector3 touchObj = hitInpo.transform.position; // 터치한 카드 오브젝트 위치.
-                for (int i = 0; i < 3; i++)
+                Vector2 touchPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+                RaycastHit2D hitInpo = Physics2D.Raycast(touchPos, Camera.main.transform.forward);
+                if(hitInpo.collider != null && (hitInpo.transform.position == myCardPos[0] || hitInpo.transform.position == myCardPos[1] || hitInpo.transform.position == myCardPos[2]))
                 {
-                    if (touchObj == myCardPos[i])
+                    Vector3 touchObj = hitInpo.transform.position; // 터치한 카드 오브젝트 위치.
+                    for (int i = 0; i < 3; i++)
                     {
-                        players[select].handcard[i].GetComponent<SpriteRenderer>().sprite = cards[playerCard[i]];
-                        isCheckCard = true;
-                        checkCount = 1;
+                        if (touchObj == myCardPos[i])
+                        {
+                            players[select].handcard[i].GetComponent<SpriteRenderer>().sprite = cards[playerCard[i]];
+                            isCheckCard = true;
+                            checkCount = 1;
+                        }
                     }
                 }
             }
+            yield return new WaitForSeconds(0.05f);             // While 루프 내부를 0.05초마다 실행.
         }
-        yield return new WaitForSeconds(0.05f);             // While 루프 내부를 0.05초마다 실행.
     }
-}
 
 
 
-
+    /// <summary>
+    /// cards안에 있는 sprite들을 섞어줌.
+    /// </summary>
     void Shuffle()
     {
         for (int i = cards.Length - 1; i > 1; --i)
@@ -221,6 +230,11 @@ public class GameManager_GM : MonoBehaviour
         }
     }
 
+
+    /// <summary>
+    /// shuffle함수 뒤에 사용해야함. 
+    /// 참여해있는 모든 인원에게 카드 정보를 부여함.
+    /// </summary>
     void PlayerCardAllocation()
     {
         for(int i = 0; i < curPlayer; i++)
