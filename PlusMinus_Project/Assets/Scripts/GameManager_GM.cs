@@ -26,7 +26,7 @@ public class GameManager_GM : MonoBehaviour
     private bool isCheckCard = false;
 
 
-    //베팅
+    //*****베팅 변수***********//
     public Button FirstBtn;
     public Button DoubleBtn;
     public Button QuarterBtn;
@@ -35,9 +35,13 @@ public class GameManager_GM : MonoBehaviour
     public Button CheckBtn;
     public Button CallBtn;
 
-    int turn = -1;
+    int turn = 0;
+    
+    int startturn;
     private int totalmoney = 0;
-
+    List<int> MoneyLog = new List<int>();
+    int Min = 10;
+    int startmoney = 20; //인당
 
 
     // Start is called before the first frame update
@@ -47,7 +51,13 @@ public class GameManager_GM : MonoBehaviour
         DistributeCard(curPlayer);
         StartCoroutine("ClickCard", 2);
 
+        startturn = Random.Range(0, curPlayer-1); // 시작지점 랜덤 지정 (구현 예정)
 
+        for(int i = 0; i < curPlayer; i++)
+        {
+            players[i].money -= startmoney;
+            totalmoney += startmoney;
+        }
         //클릭시 함수 호출하는 이벤트 트리거
         FirstBtn.onClick.AddListener(() => OnClickFirstBtn());
         DoubleBtn.onClick.AddListener(() => OnClickDoubleBtn());
@@ -173,23 +183,14 @@ public class GameManager_GM : MonoBehaviour
             if(hitInpo.collider != null && (hitInpo.transform.position == myCardPos[0] || hitInpo.transform.position == myCardPos[1] || hitInpo.transform.position == myCardPos[2]))
             {
                 Vector3 touchObj = hitInpo.transform.position; // 터치한 카드 오브젝트 위치.
-                if (touchObj == myCardPos[0])
+                for (int i = 0; i < 3; i++)
                 {
-                    players[select].handcard[0].GetComponent<SpriteRenderer>().sprite = cards[playerCard[0]];
-                    isCheckCard = true;
-                    checkCount = 1;
-                }
-                else if (touchObj == myCardPos[1])
-                {
-                    players[select].handcard[1].GetComponent<SpriteRenderer>().sprite = cards[playerCard[1]];
-                    isCheckCard = true;
-                    checkCount = 1;
-                }
-                else if (touchObj == myCardPos[2])
-                {
-                    players[select].handcard[2].GetComponent<SpriteRenderer>().sprite = cards[playerCard[2]];
-                    isCheckCard = true;
-                    checkCount = 1;
+                    if (touchObj == myCardPos[i])
+                    {
+                        players[select].handcard[i].GetComponent<SpriteRenderer>().sprite = cards[playerCard[i]];
+                        isCheckCard = true;
+                        checkCount = 1;
+                    }
                 }
             }
         }
@@ -221,7 +222,7 @@ public class GameManager_GM : MonoBehaviour
             CardInfoLoop++;
             players[i].CardInfo[2] = CardInfoLoop;
             CardInfoLoop++;
-            Debug.Log(cards[players[i].CardInfo[0]].name + ", " + cards[players[i].CardInfo[1]].name + ", " + cards[players[i].CardInfo[2]].name);
+            Debug.Log("Player"+i+1+": "+cards[players[i].CardInfo[0]].name + ", " + cards[players[i].CardInfo[1]].name + ", " + cards[players[i].CardInfo[2]].name);
         }
     }
 
@@ -310,16 +311,41 @@ public class GameManager_GM : MonoBehaviour
     private void OnClickQuaterBtn()
     {
         throw new System.NotImplementedException();
+
     }
 
     private void OnClickDoubleBtn()
     {
-        throw new System.NotImplementedException();
+        int previous = turn - 1;
+        if (turn >= 1)
+        {
+            players[(previous + 1) % curPlayer].money -= 2 * MoneyLog[previous];
+            MoneyLog.Add(2 * MoneyLog[previous]);
+            totalmoney += MoneyLog[turn];
+            turn++;
+        }
+        else
+        {
+            Debug.Log("선택 불가");
+        }
+
+        Debug.Log("턴: " + turn + "총 금액 : " + totalmoney + "전 사람 금액 : " + MoneyLog[previous]);
     }
 
     private void OnClickFirstBtn()
     {
-        throw new System.NotImplementedException();
+        if(turn == 0)
+        {
+            MoneyLog.Add(Min);
+            players[0].money -= MoneyLog[turn];
+            totalmoney += MoneyLog[turn];
+            turn++;
+        }
+        else
+        {
+            Debug.Log("선택할 수 없습니다.");
+        }
+        Debug.Log("턴: "+turn + "총 금액 : " + totalmoney+"전 사람 금액 : 없음");
     }
 
 }
