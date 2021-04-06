@@ -297,7 +297,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dc52db1ef9074304b9e85e22e56de994, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  curPlayer: 4
+  curPlayer: 5
   cards:
   - {fileID: 21300000, guid: afd5f2b81ca3a6f4c86c1f3d8ed639f4, type: 3}
   - {fileID: 21300000, guid: fe3aa48b86f1cba43a7f7e30d0aafd2f, type: 3}
