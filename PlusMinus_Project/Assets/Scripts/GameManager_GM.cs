@@ -22,10 +22,14 @@ public class GameManager_GM : MonoBehaviour
 
     public PlayerScript[] players;
     int CardInfoLoop = 1;
-    private int checkCount = 0;
+    private float checkCount = 0;
 
     private bool isDistribute = false;
     private bool isCheckCard = false;
+
+    public int set_turnTime = 10;                // 베팅 , 카드 배치 , 카드 확인 시간 설정.
+    public float inGameTime = 0;                      // 게임 진행시간.
+
 
 
     //*****베팅 변수***********//
@@ -50,6 +54,7 @@ public class GameManager_GM : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+      
         Shuffle();
         DistributeCard(curPlayer);
         StartCoroutine("ClickCard", 2);
@@ -72,9 +77,22 @@ public class GameManager_GM : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        inGameTime += Time.deltaTime;
+
+        
         if(turn/curPlayer == chapter)
         {
             chapter++;
+        }
+
+        if (isCheckCard)
+        {
+            StopCheckCard();
+        }
+
+        if(!isCheckCard && inGameTime >= set_turnTime)              // 카드 자동확인 함수.
+        {
+            AutoCheck(2);
         }
     }
 
@@ -133,9 +151,22 @@ public class GameManager_GM : MonoBehaviour
     }
 
     /// <summary>
+    /// 일정 시간동안 카드를 확인 안할시 플레이어 카드 3장중 center 카드 자동 확인.
+    /// CheckCard 코루틴 함수 중단.
+    /// </summary>
+    /// <param name="select"> 선택 가능한 플레이어 카드 , 인덱스로 전달받음(player01~05 중에서 player03이 디폴트) </param>
+    void AutoCheck(int select)
+    {
+        players[select].handcard[1].GetComponent<SpriteRenderer>().sprite = cards[players[select].CardInfo[1]];
+        isCheckCard = true;
+        StopCheckCard();
+    }
+
+    /// <summary>
     /// 카드 한장만 터치 할 수 있음.
     /// </summary>
     /// <param name="myplayer"> 본인 카드 배열 입력 ( player01 ~ 05 중에서 )  </param>
+    /// <param name="select"> 선택 가능한 플레이어 카드 , 인덱스로 전달받음(player01~05 중에서 player03이 디폴트)  </param>
     /// <returns></returns>
     IEnumerator ClickCard(int select )
     {
@@ -143,6 +174,7 @@ public class GameManager_GM : MonoBehaviour
         myCardPos[0] = players[select].handcard[0].transform.position; //left
         myCardPos[1] = players[select].handcard[1].transform.position; //center
         myCardPos[2] = players[select].handcard[2].transform.position;//right
+        
 
         int[] playerCard = new int[3];
 
@@ -210,8 +242,12 @@ public class GameManager_GM : MonoBehaviour
                     }
                 }
             }
+            
             yield return new WaitForSeconds(0.05f);             // While 루프 내부를 0.05초마다 실행.
         }
+
+
+
     }
 
 
@@ -223,7 +259,7 @@ public class GameManager_GM : MonoBehaviour
     {
         for (int i = cards.Length - 1; i > 1; --i)
         {
-            int j = Random.Range(1, cards.Length - 1);
+            int j = Random.Range(1, cards.Length );
             Sprite temp = cards[i];
             cards[i] = cards[j];
             cards[j] = temp;
@@ -246,7 +282,7 @@ public class GameManager_GM : MonoBehaviour
             players[i].CardInfo[2] = CardInfoLoop;
             CardInfoLoop++;
 
-            Debug.Log("Player"+i+1+": "+cards[players[i].CardInfo[0]].name + ", " + cards[players[i].CardInfo[1]].name + ", " + cards[players[i].CardInfo[2]].name);
+            Debug.Log("Player"+(i+1)+": "+cards[players[i].CardInfo[0]].name + ", " + cards[players[i].CardInfo[1]].name + ", " + cards[players[i].CardInfo[2]].name);
         }
     }
 
