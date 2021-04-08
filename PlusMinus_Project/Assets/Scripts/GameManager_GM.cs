@@ -13,7 +13,6 @@ public class GameManager_GM : MonoBehaviour
     //****playerscript로 이동
 
     public PlayerScript[] players;
-    int CardInfoLoop = 1;
     private float checkCount = 0;
 
     private bool isDistribute = false;
