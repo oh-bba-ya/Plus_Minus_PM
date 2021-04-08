@@ -6,19 +6,11 @@ using UnityEngine.UI;
 public class GameManager_GM : MonoBehaviour
 {
 
-    //****playerscript로 이동
-    //public int[,] arrPlayer = { { -1, -1, -1 }, { -1, -1, -1 }, { -1, -1, -1 }, { -1, -1, -1 }, { -1, -1, -1 } };            // [ total 참여 가능한 플레이어의  수 , total 받을 수 있는 카드의 수 ]  
+    public int[,] arrPlayer = { { -1, -1, -1 }, { -1, -1, -1 }, { -1, -1, -1 }, { -1, -1, -1 }, { -1, -1, -1 } };            // [ total 참여 가능한 플레이어의  수 , total 받을 수 있는 카드의 수 ]  
     public int curPlayer = 5;
     public Sprite[] cards;                  // cards[0] = 카드 뒷면.
 
     //****playerscript로 이동
-    /*
-    public GameObject[] player01 = new GameObject[3];
-    public GameObject[] player02 = new GameObject[3];
-    public GameObject[] player03 = new GameObject[3];
-    public GameObject[] player04 = new GameObject[3];
-    public GameObject[] player05 = new GameObject[3];
-    */
 
     public PlayerScript[] players;
     int CardInfoLoop = 1;
@@ -55,7 +47,6 @@ public class GameManager_GM : MonoBehaviour
     void Start()
     {
       
-        Shuffle();
         DistributeCard(curPlayer);
         StartCoroutine("ClickCard", 2);
 
@@ -115,21 +106,10 @@ public class GameManager_GM : MonoBehaviour
     /// <param name="in_player"> 현재 참여한 게임 인원 </param>
     void DistributeCard(int in_player)
     {
-
-        for(int i = 0; i < in_player; i++)
-        {
-            //cardback으로 먼저 설정하기.
-            players[i].SetPlayerCard(cards, 0, 0);
-            players[i].SetPlayerCard(cards, 1, 0);
-            players[i].SetPlayerCard(cards, 2, 0);
-        }
-
-        
         isDistribute = true;
         if (isDistribute)
         {
-            PlayerCardAllocation();
-            //Playerallocation(curPlayer, RandomCardIndex(curPlayer));
+            Playerallocation(curPlayer, RandomCardIndex(curPlayer));
         }
         
     }
@@ -175,53 +155,45 @@ public class GameManager_GM : MonoBehaviour
         myCardPos[1] = players[select].handcard[1].transform.position; //center
         myCardPos[2] = players[select].handcard[2].transform.position;//right
         
-
         int[] playerCard = new int[3];
 
-        for(int i = 0; i < 3; i++)
+         // 파라미터로 입력받은 게임오브젝트 배열이 player01~05 중에서 어떤 것인지 확인 후 맞는 플레이어 카드 인덱스 번호 넣어줌.
+        if(myCardPos[0] == players[0].transform.position)
         {
-            playerCard[i] = players[select].CardInfo[i];
+            for(int i = 0; i < 3; i++)
+            {
+                playerCard[i] = arrPlayer[0,i];                 
+            }
         }
-
-        //****playerscript로 이동
-        /*
-    // 파라미터로 입력받은 게임오브젝트 배열이 player01~05 중에서 어떤 것인지 확인 후 맞는 플레이어 카드 인덱스 번호 넣어줌.
-    if(myCardPos[0] == player01[0].transform.position)
-    {
-        for(int i = 0; i < 3; i++)
+        else if(myCardPos[0] == players[0].transform.position)
         {
-            playerCard[i] = arrPlayer[0,i];                 
+            for (int i = 0; i < 3; i++)
+            {
+                playerCard[i] = arrPlayer[1, i];
+            }
         }
-    }
-    else if(myCardPos[0] == player02[0].transform.position)
-    {
-        for (int i = 0; i < 3; i++)
+        else if(myCardPos[0] == players[0].transform.position)
         {
-            playerCard[i] = arrPlayer[1, i];
+            for (int i = 0; i < 3; i++)
+            {
+                playerCard[i] = arrPlayer[2, i];
+            }
         }
-    }
-    else if(myCardPos[0] == player03[0].transform.position)
-    {
-        for (int i = 0; i < 3; i++)
+        else if (myCardPos[0] == players[0].transform.position)
         {
-            playerCard[i] = arrPlayer[2, i];
+            for (int i = 0; i < 3; i++)
+            {
+                playerCard[i] = arrPlayer[3, i];
+            }
         }
-    }
-    else if (myCardPos[0] == player04[0].transform.position)
-    {
-        for (int i = 0; i < 3; i++)
+        else
         {
-            playerCard[i] = arrPlayer[3, i];
+            for (int i = 0; i < 3; i++)
+            {
+                playerCard[i] = arrPlayer[4, i];
+            }
         }
-    }
-    else
-    {
-        for (int i = 0; i < 3; i++)
-        {
-            playerCard[i] = arrPlayer[4, i];
-        }
-    }
-        */
+        
         while (checkCount < 1)
         {
             if (Input.GetMouseButton(0))
@@ -252,41 +224,7 @@ public class GameManager_GM : MonoBehaviour
 
 
 
-    /// <summary>
-    /// cards안에 있는 sprite들을 섞어줌.
-    /// </summary>
-    void Shuffle()
-    {
-        for (int i = cards.Length - 1; i > 1; --i)
-        {
-            int j = Random.Range(1, cards.Length );
-            Sprite temp = cards[i];
-            cards[i] = cards[j];
-            cards[j] = temp;
-        }
-    }
 
-
-    /// <summary>
-    /// shuffle함수 뒤에 사용해야함. 
-    /// 참여해있는 모든 인원에게 카드 정보를 부여함.
-    /// </summary>
-    void PlayerCardAllocation()
-    {
-        for(int i = 0; i < curPlayer; i++)
-        {
-            players[i].CardInfo[0] = CardInfoLoop;
-            CardInfoLoop++;
-            players[i].CardInfo[1] = CardInfoLoop;
-            CardInfoLoop++;
-            players[i].CardInfo[2] = CardInfoLoop;
-            CardInfoLoop++;
-
-            Debug.Log("Player"+(i+1)+": "+cards[players[i].CardInfo[0]].name + ", " + cards[players[i].CardInfo[1]].name + ", " + cards[players[i].CardInfo[2]].name);
-        }
-    }
-
-    /*
     /// <summary>
     /// 플레이어 인원수 만큼 RandomCardIndex를 통해 반한된 2차원 배열을 플레이어 에게 저장함.
     /// </summary>
@@ -343,7 +281,7 @@ public class GameManager_GM : MonoBehaviour
     }
     return index;
 }
-    */
+    
 
 
 

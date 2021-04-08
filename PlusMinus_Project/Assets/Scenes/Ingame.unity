@@ -294,7 +294,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 32582470}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: dc52db1ef9074304b9e85e22e56de994, type: 3}
+  m_Script: {fileID: 11500000, guid: 767ebfde59d0b1341b0b31a235875bde, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   curPlayer: 5
@@ -358,6 +358,8 @@ MonoBehaviour:
   - {fileID: 1446536605}
   - {fileID: 641188655}
   - {fileID: 685049697}
+  set_turnTime: 10
+  inGameTime: 0
   FirstBtn: {fileID: 789290383}
   DoubleBtn: {fileID: 785927956}
   QuarterBtn: {fileID: 678544366}
