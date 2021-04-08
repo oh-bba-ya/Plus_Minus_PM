@@ -7,7 +7,7 @@ public class GameManager_GM : MonoBehaviour
 {
 
     public int[,] arrPlayer = { { -1, -1, -1 }, { -1, -1, -1 }, { -1, -1, -1 }, { -1, -1, -1 }, { -1, -1, -1 } };            // [ total 참여 가능한 플레이어의  수 , total 받을 수 있는 카드의 수 ]  
-    public int curPlayer = 5;
+    public int curPlayer = 5;               // 현재 방에 참여한 인원.
     public Sprite[] cards;                  // cards[0] = 카드 뒷면.
 
     //****playerscript로 이동
@@ -48,6 +48,7 @@ public class GameManager_GM : MonoBehaviour
     {
       
         DistributeCard(curPlayer);
+
         StartCoroutine("ClickCard", 2);
 
         BettingStart();
@@ -106,12 +107,7 @@ public class GameManager_GM : MonoBehaviour
     /// <param name="in_player"> 현재 참여한 게임 인원 </param>
     void DistributeCard(int in_player)
     {
-        isDistribute = true;
-        if (isDistribute)
-        {
-            Playerallocation(curPlayer, RandomCardIndex(curPlayer));
-        }
-        
+        RandomCardIndex(in_player);
     }
 
     /// <summary>
@@ -225,62 +221,60 @@ public class GameManager_GM : MonoBehaviour
 
 
 
-    /// <summary>
-    /// 플레이어 인원수 만큼 RandomCardIndex를 통해 반한된 2차원 배열을 플레이어 에게 저장함.
-    /// </summary>
-    /// <param name="in_player"> 현재 참여한 플레이어의 숫자를 입력 받음.</param> 
-    /// <param name="index"> GameManager_GM 스크립트에 저장된 카드 스프라이트 인덱스를 RandomCardIndex 함수로 부터 return 한 index를 입력받음.</param> 
-    void Playerallocation(int in_player,int[,] index)
-{
-    for(int i = 0; i < 5; i++)
-    {
-        for(int j = 0; j < 3; j++)
-        {
-            if (i < in_player)
-            {
-                arrPlayer[i, j] = index[i,j];
-            }
-        }
-    }
-}
 
     /// <summary>
-    /// 스프라이트 카드 랜덤 인덱스 생성 ( 중복 제거)
     /// 여기서 인덱스를 입력받아 각 플레이어에게 인덱스에 맞춰서 카드를 결정해줌.
+    /// 셔플 알고리즘 사용.
     /// </summary>
     /// <param name="in_player"> 현재 참가한 게임 인원.</param> 
     /// <returns></returns>
-    int[,] RandomCardIndex(int in_player)
-{
-    List<int> rand = new List<int>();
-    int randnumber = Random.Range(1,53);
-    int[,] index = { { -1, -1, -1 }, { -1, -1, -1 }, { -1, -1, -1 }, { -1, -1, -1 }, { -1, -1, -1 } };
-
-    for(int i=0; i<in_player * 3;)
+    void RandomCardIndex(int in_player)
     {
-        if (rand.Contains(randnumber))
-        {
-            randnumber = Random.Range(1, 53);
-        }
-        else
-        {
-            rand.Add(randnumber);
-            i++;
-        }
-    }
+        int rand01, rand02;
+        int[] array_temp = new int[cards.Length];
+        int variable_temp;
 
-    int count = 0;
-    for (int i = 0; i < in_player; i++)
-    {
-
-        for(int j = 0; j < 3; j++)
+        int count = 0; 
+        for(int i = 0; i < cards.Length; i++)
         {
-            index[i, j] = rand[count];
+            array_temp[i] = count;
             count++;
         }
+
+        for(int i = 0; i<in_player*3;i++ )
+        {
+            rand01 = Random.Range(1, cards.Length);
+            rand02 = Random.Range(1, cards.Length);
+
+            variable_temp = array_temp[rand01];
+            array_temp[rand01] = array_temp[rand02];
+            array_temp[rand02] = variable_temp;
+
+        }
+
+        count = 0;
+        for (int i = 0; i < in_player; i++)
+        {
+
+            for(int j = 0; j < 3; j++)
+            {
+                arrPlayer[i, j] = array_temp[count];
+                count++;
+            }
+        }
+
+        for(int i = 0; i < players.Length; i++)
+        {
+            for(int j = 0; j < 3; j++)
+            {
+                players[i].SetPlayerCard(cards, j, 0);
+
+            }
+
+        }
+
+        isDistribute = true;
     }
-    return index;
-}
     
 
 
