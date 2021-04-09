@@ -7,6 +7,7 @@ public class GameManager_GM : MonoBehaviour
 {
 
     public int[,] arrPlayer = { { -1, -1, -1 }, { -1, -1, -1 }, { -1, -1, -1 }, { -1, -1, -1 }, { -1, -1, -1 } };            // [ total 참여 가능한 플레이어의  수 , total 받을 수 있는 카드의 수 ]  
+    int[] cardValue = { -1, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 6, 6, 6, 6, 7, 7, 7, 7, 8, 8, 8, 8, 9, 9, 9, 9, 10, 10, 10, 10, 1, 1, 1, 1, 11, 11, 11, 11, 13, 13, 13, 13, 12, 12, 12, 12 };
     public int curPlayer = 5;               // 현재 방에 참여한 인원.
     public Sprite[] cards;                  // cards[0] = 카드 뒷면.
 
@@ -15,8 +16,12 @@ public class GameManager_GM : MonoBehaviour
     public PlayerScript[] players;
     private float checkCount = 0;
 
-    private bool isDistribute = false;
+
+
     private bool isCheckCard = false;
+    private bool isDragDrop = false;
+    private bool isChangeCard = false;                  // 카드 가운데 + , - 로 바뀜.
+
 
     public int set_turnTime = 10;                // 베팅 , 카드 배치 , 카드 확인 시간 설정.
     public float inGameTime = 0;                      // 게임 진행시간.
@@ -132,16 +137,16 @@ public class GameManager_GM : MonoBehaviour
     /// <param name="select"> 선택 가능한 플레이어 카드 , 인덱스로 전달받음(player01~05 중에서 player03이 디폴트) </param>
     void AutoCheck(int select)
     {
-        players[select].handcard[1].GetComponent<SpriteRenderer>().sprite = cards[players[select].CardInfo[1]];
+        players[select].handcard[1].GetComponent<SpriteRenderer>().sprite = cards[arrPlayer[select,1]];
         isCheckCard = true;
         StopCheckCard();
     }
+    
 
     /// <summary>
     /// 카드 한장만 터치 할 수 있음.
     /// </summary>
-    /// <param name="myplayer"> 본인 카드 배열 입력 ( player01 ~ 05 중에서 )  </param>
-    /// <param name="select"> 선택 가능한 플레이어 카드 , 인덱스로 전달받음(player01~05 중에서 player03이 디폴트)  </param>
+    /// <param name="select"> 선택 가능한 플레이어 카드 , 인덱스로 전달받음(player01~05 중에서 player03이 디폴트(index = 2))  </param>
     /// <returns></returns>
     IEnumerator ClickCard(int select )
     {
@@ -150,45 +155,7 @@ public class GameManager_GM : MonoBehaviour
         myCardPos[1] = players[select].handcard[1].transform.position; //center
         myCardPos[2] = players[select].handcard[2].transform.position;//right
         
-        int[] playerCard = new int[3];
 
-         // 파라미터로 입력받은 게임오브젝트 배열이 player01~05 중에서 어떤 것인지 확인 후 맞는 플레이어 카드 인덱스 번호 넣어줌.
-        if(myCardPos[0] == players[0].transform.position)
-        {
-            for(int i = 0; i < 3; i++)
-            {
-                playerCard[i] = arrPlayer[0,i];                 
-            }
-        }
-        else if(myCardPos[0] == players[0].transform.position)
-        {
-            for (int i = 0; i < 3; i++)
-            {
-                playerCard[i] = arrPlayer[1, i];
-            }
-        }
-        else if(myCardPos[0] == players[0].transform.position)
-        {
-            for (int i = 0; i < 3; i++)
-            {
-                playerCard[i] = arrPlayer[2, i];
-            }
-        }
-        else if (myCardPos[0] == players[0].transform.position)
-        {
-            for (int i = 0; i < 3; i++)
-            {
-                playerCard[i] = arrPlayer[3, i];
-            }
-        }
-        else
-        {
-            for (int i = 0; i < 3; i++)
-            {
-                playerCard[i] = arrPlayer[4, i];
-            }
-        }
-        
         while (checkCount < 1)
         {
             if (Input.GetMouseButton(0))
@@ -202,7 +169,7 @@ public class GameManager_GM : MonoBehaviour
                     {
                         if (touchObj == myCardPos[i])
                         {
-                            players[select].handcard[i].GetComponent<SpriteRenderer>().sprite = cards[playerCard[i]];
+                            players[select].handcard[i].GetComponent<SpriteRenderer>().sprite = cards[arrPlayer[select,i]];
                             isCheckCard = true;
                             checkCount = 1;
                         }
@@ -216,8 +183,6 @@ public class GameManager_GM : MonoBehaviour
 
 
     }
-
-
 
 
 
@@ -272,11 +237,11 @@ public class GameManager_GM : MonoBehaviour
 
         }
 
-        isDistribute = true;
+        
     }
     
 
-
+    // 플레
 
 
     private void OnClickCallBtn()
