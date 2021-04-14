@@ -47,11 +47,18 @@ public class GameManager_GM : MonoBehaviour
     int startmoney = 20; //인당
 
 
+    //*********** 텍스트 변수  단계별 표시 ***********//
+    public Text stepText;
+
+
     // Start is called before the first frame update
     void Start()
     {
+        int[] testplayer = { 0, 1, 2, 3, 4 };
+        int[,] testcards = { { 0, 1, 2 }, { 3, 4, 5 } };
       
-        DistributeCard(curPlayer);
+        DistributeCard(curPlayer,4,testplayer,testcards);
+        
 
         StartCoroutine("ClickCard", 2);
 
@@ -75,8 +82,9 @@ public class GameManager_GM : MonoBehaviour
     {
         inGameTime += Time.deltaTime;
 
-        
-        if(turn/curPlayer == chapter)
+        DisplayStepByStep();
+
+        if (turn/curPlayer == chapter)
         {
             chapter++;
         }
@@ -91,6 +99,22 @@ public class GameManager_GM : MonoBehaviour
             AutoCheck(2);
         }
     }
+
+
+    void DisplayStepByStep()
+    {
+        if(inGameTime < set_turnTime)
+        {
+            stepText.text = "카드를 확인 \n 해주세요 ";
+        }
+        else if(inGameTime < set_turnTime * 2)
+        {
+            stepText.text = "카드를 배치 \n 해주세요";
+        }
+    }
+
+
+
 
     /// <summary>
     /// 게임 시작시 모든 인원에게서 초기 베팅비를 가져옴.
@@ -108,10 +132,122 @@ public class GameManager_GM : MonoBehaviour
     /// <summary>
     /// 게임 시작시 참가한 인원 만큼 카드를 나눠줌.
     /// </summary>
-    /// <param name="in_player"> 현재 참여한 게임 인원 </param>
-    void DistributeCard(int in_player)
+    /// <param name="in_player"> 현재 참여한 총 게임 인원 </param>
+    /// <param name="myNumber"> 자기 자신의 번호 (서버에서 받아올 플레이어 정보랑 비교하기 위한것) </param>
+    /// <param name="playerNumber"> 서버에서 넘어오는 플레이어들의 고유 번호 (본인것도 포함) </param>
+    /// <param name="playerCards"> 서버에서 넘어오는 플레이어들의 카드 정보 (본인것도 포함) </param>
+    void DistributeCard(int in_player,int myNumber,int[] playerNumber , int[,] playerCards)
     {
+        int playerIndex = 2;                // 본인의 고유정보와 , 서버에서 전달된 본인의 정보 인덱스
+
+
         RandomCardIndex(in_player);
+
+        for(int i = 0; i < in_player; i++)
+        {
+            if(myNumber == playerNumber[i])
+            {
+                playerIndex = i;
+            }
+        }
+
+
+        switch (playerIndex)
+        {
+            case 0:
+                for(int i = 0; i < in_player; i++)
+                {
+                    if (i < 3)
+                    {
+                        players[i+2].handcard[0].GetComponent<SpriteRenderer>().sprite = cards[arrPlayer[i, 0]];
+                        players[i+2].handcard[1].GetComponent<SpriteRenderer>().sprite = cards[arrPlayer[i, 1]];
+                        players[i+2].handcard[2].GetComponent<SpriteRenderer>().sprite = cards[arrPlayer[i, 2]];
+                    }
+                    else
+                    {
+                        players[i - 3].handcard[0].GetComponent<SpriteRenderer>().sprite = cards[arrPlayer[i, 0]];
+                        players[i - 3].handcard[1].GetComponent<SpriteRenderer>().sprite = cards[arrPlayer[i, 1]];
+                        players[i - 3].handcard[2].GetComponent<SpriteRenderer>().sprite = cards[arrPlayer[i, 2]];
+                    }
+                }
+                break;
+
+            case 1:
+                for(int i = 0; i < in_player; i++)
+                {
+                    if( i < 4)
+                    {
+                        players[i + 1].handcard[0].GetComponent<SpriteRenderer>().sprite = cards[arrPlayer[i , 0]];
+                        players[i + 1].handcard[1].GetComponent<SpriteRenderer>().sprite = cards[arrPlayer[i , 1]];
+                        players[i + 1].handcard[2].GetComponent<SpriteRenderer>().sprite = cards[arrPlayer[i , 2]];
+                    }
+                    else
+                    {
+                        players[i - 4].handcard[0].GetComponent<SpriteRenderer>().sprite = cards[arrPlayer[i , 0]];
+                        players[i - 4].handcard[1].GetComponent<SpriteRenderer>().sprite = cards[arrPlayer[i , 1]];
+                        players[i - 4].handcard[2].GetComponent<SpriteRenderer>().sprite = cards[arrPlayer[i , 2]];
+                    }
+                }
+                break;
+
+            case 2:
+                for (int i = 0; i < in_player; i++)
+                {
+                    players[i].handcard[0].GetComponent<SpriteRenderer>().sprite = cards[arrPlayer[i, 0]];
+                    players[i].handcard[1].GetComponent<SpriteRenderer>().sprite = cards[arrPlayer[i, 1]];
+                    players[i].handcard[2].GetComponent<SpriteRenderer>().sprite = cards[arrPlayer[i, 2]];
+
+                }
+                break;
+
+            case 3:
+                for (int i = 0; i < in_player; i++)
+                {
+                    if( i > 0)
+                    {
+                        players[i - 1].handcard[0].GetComponent<SpriteRenderer>().sprite = cards[arrPlayer[i, 0]];
+                        players[i - 1].handcard[1].GetComponent<SpriteRenderer>().sprite = cards[arrPlayer[i , 1]];
+                        players[i - 1].handcard[2].GetComponent<SpriteRenderer>().sprite = cards[arrPlayer[i , 2]];
+                    }
+                    else
+                    {
+                        players[i + 4].handcard[0].GetComponent<SpriteRenderer>().sprite = cards[arrPlayer[i , 0]];
+                        players[i + 4].handcard[1].GetComponent<SpriteRenderer>().sprite = cards[arrPlayer[i , 1]];
+                        players[i + 4].handcard[2].GetComponent<SpriteRenderer>().sprite = cards[arrPlayer[i , 2]];
+                    }
+
+                }
+                break;
+            case 4:
+                for (int i = 0; i < in_player; i++)
+                {
+                    if (i < 2)
+                    {
+                        players[i + 3].handcard[0].GetComponent<SpriteRenderer>().sprite = cards[arrPlayer[i , 0]];
+                        players[i + 3].handcard[1].GetComponent<SpriteRenderer>().sprite = cards[arrPlayer[i , 1]];
+                        players[i + 3].handcard[2].GetComponent<SpriteRenderer>().sprite = cards[arrPlayer[i , 2]];
+                    }
+                    else
+                    {
+                        players[i - 2].handcard[0].GetComponent<SpriteRenderer>().sprite = cards[arrPlayer[i , 0]];
+                        players[i - 2].handcard[1].GetComponent<SpriteRenderer>().sprite = cards[arrPlayer[i  , 1]];
+                        players[i - 2].handcard[2].GetComponent<SpriteRenderer>().sprite = cards[arrPlayer[i , 2]];
+                    }
+
+                }
+                break;
+            default:
+                break;
+
+
+
+        }
+
+
+
+
+
+
     }
 
     /// <summary>
@@ -190,7 +326,7 @@ public class GameManager_GM : MonoBehaviour
     /// 여기서 인덱스를 입력받아 각 플레이어에게 인덱스에 맞춰서 카드를 결정해줌.
     /// 셔플 알고리즘 사용.
     /// </summary>
-    /// <param name="in_player"> 현재 참가한 게임 인원.</param> 
+    /// <param name="in_player"> 현재 참가한 게임 총 인원.</param> 
     /// <returns></returns>
     void RandomCardIndex(int in_player)
     {
@@ -204,6 +340,7 @@ public class GameManager_GM : MonoBehaviour
             array_temp[i] = count;
             count++;
         }
+        
 
         for(int i = 0; i<in_player*3;i++ )
         {
@@ -216,7 +353,7 @@ public class GameManager_GM : MonoBehaviour
 
         }
 
-        count = 0;
+        count = 1;
         for (int i = 0; i < in_player; i++)
         {
 
@@ -236,6 +373,11 @@ public class GameManager_GM : MonoBehaviour
             }
 
         }
+        Debug.Log("card 01 : " + arrPlayer[0, 0] + ", " + arrPlayer[0, 1] + ", " + arrPlayer[0, 2]);
+        Debug.Log("card 02 : " + arrPlayer[1, 0] + ", " + arrPlayer[1, 1] + ", " + arrPlayer[1, 2]);
+        Debug.Log("card 03 : " + arrPlayer[2, 0] + ", " + arrPlayer[2, 1] + ", " + arrPlayer[2, 2]);
+        Debug.Log("card 04 : " + arrPlayer[3, 0] + ", " + arrPlayer[3, 1] + ", " + arrPlayer[3, 2]);
+        Debug.Log("card 05 : " + arrPlayer[4, 0] + ", " + arrPlayer[4, 1] + ", " + arrPlayer[4, 2]);
 
         
     }
