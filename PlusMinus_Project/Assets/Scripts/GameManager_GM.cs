@@ -7,20 +7,36 @@ public class GameManager_GM : MonoBehaviour
 {
 
     public int[,] arrPlayer = { { -1, -1, -1 }, { -1, -1, -1 }, { -1, -1, -1 }, { -1, -1, -1 }, { -1, -1, -1 } };            // [ total 참여 가능한 플레이어의  수 , total 받을 수 있는 카드의 수 ]  
-    int[] cardValue = { -1, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 6, 6, 6, 6, 7, 7, 7, 7, 8, 8, 8, 8, 9, 9, 9, 9, 10, 10, 10, 10, 1, 1, 1, 1, 11, 11, 11, 11, 13, 13, 13, 13, 12, 12, 12, 12 };
+    public int[] cardValue = { -1, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 6, 6, 6, 6, 7, 7, 7, 7, 8, 8, 8, 8, 9, 9, 9, 9, 10, 10, 10, 10, 1, 1, 1, 1, 11, 11, 11, 11, 13, 13, 13, 13, 12, 12, 12, 12 };
+    public int[] expressionValue = { -2, -3, -4 };          // -2 = plus , -3 = minus , -4 = mult .
     public int curPlayer = 5;               // 현재 방에 참여한 인원.
     public Sprite[] cards;                  // cards[0] = 카드 뒷면.
+    public Sprite[] expressions;           // +, = , * 스프라이트 저장.
+
+    /// <summary>
+    /// player03 그룹 오브젝트 변수.
+    /// </summary>
+    public GameObject[] originPos = new GameObject[3];
+    /// <summary>
+    /// player03 자식 오브젝트들 위치 저장.
+    /// </summary>
+    Vector3[] startPos = new Vector3[3];
 
     //****playerscript로 이동
 
     public PlayerScript[] players;
     private float checkCount = 0;
 
+    public int myPortIndex;                    // 자신의 번호를 [0,1,2,3,4] 중 인덱스로 입력 , 카드 드래그 드랍때 정보를 바꿔주기 위해 쓸거임. , CardDrag에서도 쓰이니 꼭!!
 
 
-    private bool isCheckCard = false;
-    private bool isDragDrop = false;
-    private bool isChangeCard = false;                  // 카드 가운데 + , - 로 바뀜.
+    /// <summary>
+    /// bool isCheckCard , DragDrop , ChangeCard 들은 각 행동이 끝나면 true 로 전환.
+    /// </summary>
+    public bool isCheckCard = false;                       
+    public bool isDragDrop = false;
+    public bool isChangeCard = false;                  // 카드 가운데 + , - 로 바뀜.
+    public bool isBetting = false;
 
 
     public int set_turnTime = 10;                // 베팅 , 카드 배치 , 카드 확인 시간 설정.
@@ -28,14 +44,16 @@ public class GameManager_GM : MonoBehaviour
 
 
 
-    //*****베팅 변수***********//
-    public Button FirstBtn;
-    public Button DoubleBtn;
-    public Button QuarterBtn;
+    /// <summary>
+    /// 베팅 버튼 변수들.
+    /// </summary>
+    public Button CheckBtn;
+    public Button BBingBtn;
+    public Button CallBtn;
+    public Button DDaDangBtn;
     public Button HalfBtn;
     public Button DieBtn;
-    public Button CheckBtn;
-    public Button CallBtn;
+    
 
     int turn = 0;
     int chapter = 1;
@@ -51,27 +69,34 @@ public class GameManager_GM : MonoBehaviour
     public Text stepText;
 
 
+
     // Start is called before the first frame update
     void Start()
     {
+        for(int i = 0; i < startPos.Length; i++)
+        {
+            startPos[i] = originPos[i].transform.position;
+            
+        }
+
         int[] testplayer = { 0, 1, 2, 3, 4 };
         int[,] testcards = { { 0, 1, 2 }, { 3, 4, 5 } };
       
-        DistributeCard(curPlayer,4,testplayer,testcards);
+        DistributeCard(curPlayer, myPortIndex, testplayer,testcards);
         
 
-        StartCoroutine("ClickCard", 2);
+        //StartCoroutine(ClickCard(2, myPortIndex));
 
         BettingStart();
 
         //클릭시 함수 호출하는 이벤트 트리거
-        FirstBtn.onClick.AddListener(() => OnClickFirstBtn());
-        DoubleBtn.onClick.AddListener(() => OnClickDoubleBtn());
-        QuarterBtn.onClick.AddListener(() => OnClickQuaterBtn());
-        HalfBtn.onClick.AddListener(() => OnClickHalfBtn());
-        DieBtn.onClick.AddListener(() => OnClickDieBtn());
-        CheckBtn.onClick.AddListener(() => OnClickCheckBtn());
-        CallBtn.onClick.AddListener(() => OnClickCallBtn());
+        //FirstBtn.onClick.AddListener(() => OnClickFirstBtn());
+        //DoubleBtn.onClick.AddListener(() => OnClickDoubleBtn());
+        //QuarterBtn.onClick.AddListener(() => OnClickQuaterBtn());
+        //HalfBtn.onClick.AddListener(() => OnClickHalfBtn());
+        //DieBtn.onClick.AddListener(() => OnClickDieBtn());
+        //CheckBtn.onClick.AddListener(() => OnClickCheckBtn());
+        //CallBtn.onClick.AddListener(() => OnClickCallBtn());
 
     }
 
@@ -89,30 +114,62 @@ public class GameManager_GM : MonoBehaviour
             chapter++;
         }
 
+        if(!isCheckCard && inGameTime < set_turnTime)
+        {
+            StartCoroutine(ClickCard(2, myPortIndex));
+        }
+
+        if(!isCheckCard && inGameTime >= set_turnTime)              // 카드 자동확인 함수 시작.
+        {
+            AutoCheck(2, myPortIndex);
+            OFFCardDrag();
+        }
+        
+
         if (isCheckCard)
         {
             StopCheckCard();
+            
         }
 
-        if(!isCheckCard && inGameTime >= set_turnTime)              // 카드 자동확인 함수.
+        if (isCheckCard && inGameTime >= set_turnTime)           // 카드 확인도 하고 , 시간초과일때 드래그 스왑 종료.
         {
-            AutoCheck(2);
+            OFFCardDrag();
+        }
+
+        if(isDragDrop && isChangeCard)
+        {
+            BackPosition();
         }
     }
 
 
     void DisplayStepByStep()
     {
-        if(inGameTime < set_turnTime)
+        if(inGameTime < set_turnTime && !isCheckCard)
         {
-            stepText.text = "카드를 확인 \n 해주세요 ";
+            stepText.text = "카드를 확인 \n 해주세요";
         }
-        else if(inGameTime < set_turnTime * 2)
+
+        if(isCheckCard)
         {
             stepText.text = "카드를 배치 \n 해주세요";
         }
+
+        if(isCheckCard && isDragDrop)
+        {
+            stepText.text = "";
+        }
     }
 
+
+    /// <summary>
+    /// 카드 드래그 스왑 종료 함수.
+    /// </summary>
+    void OFFCardDrag()
+    {
+        isDragDrop = true;
+    }
 
 
 
@@ -138,6 +195,11 @@ public class GameManager_GM : MonoBehaviour
     /// <param name="playerCards"> 서버에서 넘어오는 플레이어들의 카드 정보 (본인것도 포함) </param>
     void DistributeCard(int in_player,int myNumber,int[] playerNumber , int[,] playerCards)
     {
+        // 카드가 잘나눠지는지 확인하기 위해 앞면 카드를 배정해줬지만 발표가 끝난 후에는 카드 뒷면을 할당해줄거임.
+        // 스프라이트 앞면에 해당하는 인덱스를 각 플레이어에게 할당해줄거임.
+        // 뒷면 카드 확인 하기위해 mynumber = 4일때 가렸음.
+
+
         int playerIndex = 2;                // 본인의 고유정보와 , 서버에서 전달된 본인의 정보 인덱스
 
 
@@ -229,14 +291,18 @@ public class GameManager_GM : MonoBehaviour
                     }
                     else
                     {
-                        players[i - 2].handcard[0].GetComponent<SpriteRenderer>().sprite = cards[arrPlayer[i , 0]];
-                        players[i - 2].handcard[1].GetComponent<SpriteRenderer>().sprite = cards[arrPlayer[i  , 1]];
-                        players[i - 2].handcard[2].GetComponent<SpriteRenderer>().sprite = cards[arrPlayer[i , 2]];
+                        players[i - 2].handcard[0].GetComponent<SpriteRenderer>().sprite = cards[0];
+                        players[i - 2].handcard[1].GetComponent<SpriteRenderer>().sprite = cards[0];
+                        players[i - 2].handcard[2].GetComponent<SpriteRenderer>().sprite = cards[0];
+                        //players[i - 2].handcard[0].GetComponent<SpriteRenderer>().sprite = cards[arrPlayer[i , 0]];
+                        //players[i - 2].handcard[1].GetComponent<SpriteRenderer>().sprite = cards[arrPlayer[i  , 1]];
+                        //players[i - 2].handcard[2].GetComponent<SpriteRenderer>().sprite = cards[arrPlayer[i , 2]];
                     }
 
                 }
                 break;
             default:
+                Debug.Log(" Distribute 예외 상황!!! 카드 나눠주는거 오류  확인하셈");
                 break;
 
 
@@ -245,51 +311,64 @@ public class GameManager_GM : MonoBehaviour
 
 
 
-
-
-
     }
 
     /// <summary>
-    /// 카드 확인 ClickCard() 함수 코루틴 시작. 
+    /// 카드 드래그 끝나면 처음 위치로 카드 돌리기.
     /// </summary>
-    void StartCheckCard()
+
+    void BackPosition()
     {
-        StartCoroutine("ClickCard",2);
+        for(int i = 0; i < originPos.Length; i++)
+        {
+            originPos[i].transform.position = startPos[i];
+            
+        }
+
     }
+
+
+
+
+
+
 
     /// <summary>
     /// 카드 확인 ClickCard() 함수 코루틴 종료
     /// </summary>
     void StopCheckCard()
     {
-        StopCoroutine("ClickCard");
+        StopCoroutine(ClickCard(2, myPortIndex));
+        checkCount = 1;
     }
 
     /// <summary>
     /// 일정 시간동안 카드를 확인 안할시 플레이어 카드 3장중 center 카드 자동 확인.
     /// CheckCard 코루틴 함수 중단.
+    /// 만약 카드 확인을 못하게 된다면 확인할 시간도 없이 바로 + , - 로 바뀜 [ 하지만 굳이 보여줄 시간을 따로 줄 필요없음 ]
     /// </summary>
-    /// <param name="select"> 선택 가능한 플레이어 카드 , 인덱스로 전달받음(player01~05 중에서 player03이 디폴트) </param>
-    void AutoCheck(int select)
+    /// <param name="select"> player01~05 위치 중 모든 플레이어는 가운데에 자기 카드가 존재하므로 디폴트 = player03 오브젝트의 위치 </param>
+    /// <param name="myNumber"> 서버로 부터 내 번호를 입력 받아서 나의 카드 부여 </param>
+    void AutoCheck(int select,int myNumber)
     {
-        players[select].handcard[1].GetComponent<SpriteRenderer>().sprite = cards[arrPlayer[select,1]];
+        players[select].handcard[1].GetComponent<SpriteRenderer>().sprite = cards[arrPlayer[myNumber, 1]];
         isCheckCard = true;
         StopCheckCard();
     }
-    
+
 
     /// <summary>
     /// 카드 한장만 터치 할 수 있음.
     /// </summary>
-    /// <param name="select"> 선택 가능한 플레이어 카드 , 인덱스로 전달받음(player01~05 중에서 player03이 디폴트(index = 2))  </param>
+    /// <param name="select"> 가운데 카드 인덱스02 , 가운데에 존재하는 오브젝트 위치.  </param>
+    /// <param name="myNumber">  본인 번호 </param>
     /// <returns></returns>
-    IEnumerator ClickCard(int select )
+    IEnumerator ClickCard(int select, int myNumber )
     {
-        Vector3[] myCardPos = new Vector3[3];
-        myCardPos[0] = players[select].handcard[0].transform.position; //left
-        myCardPos[1] = players[select].handcard[1].transform.position; //center
-        myCardPos[2] = players[select].handcard[2].transform.position;//right
+        GameObject[] myCardPos = new GameObject[3];
+        myCardPos[0] = players[select].handcard[0]; //left
+        myCardPos[1] = players[select].handcard[1]; //center
+        myCardPos[2] = players[select].handcard[2];//right
         
 
         while (checkCount < 1)
@@ -298,21 +377,24 @@ public class GameManager_GM : MonoBehaviour
             {
                 Vector2 touchPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
                 RaycastHit2D hitInpo = Physics2D.Raycast(touchPos, Camera.main.transform.forward);
-                if(hitInpo.collider != null && (hitInpo.transform.position == myCardPos[0] || hitInpo.transform.position == myCardPos[1] || hitInpo.transform.position == myCardPos[2]))
+                
+                if(hitInpo.collider != null && (hitInpo.transform.gameObject == myCardPos[0] || hitInpo.transform.gameObject == myCardPos[1] || hitInpo.transform.gameObject == myCardPos[2]))
                 {
-                    Vector3 touchObj = hitInpo.transform.position; // 터치한 카드 오브젝트 위치.
+                    GameObject touchObj = hitInpo.transform.gameObject; // 터치한 카드 오브젝트 위치.
                     for (int i = 0; i < 3; i++)
                     {
                         if (touchObj == myCardPos[i])
                         {
-                            players[select].handcard[i].GetComponent<SpriteRenderer>().sprite = cards[arrPlayer[select,i]];
+                            players[select].handcard[i].GetComponent<SpriteRenderer>().sprite = cards[arrPlayer[myNumber, i]];
                             isCheckCard = true;
                             checkCount = 1;
                         }
                     }
                 }
+                
             }
-            
+           
+
             yield return new WaitForSeconds(0.05f);             // While 루프 내부를 0.05초마다 실행.
         }
 
@@ -381,6 +463,9 @@ public class GameManager_GM : MonoBehaviour
 
         
     }
+
+
+
     
 
     // 플레
