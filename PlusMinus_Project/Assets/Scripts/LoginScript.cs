@@ -20,7 +20,15 @@ public class LoginScript : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+        Load();
+    }
+
+    public void Load()
+    {
+        if (PlayerPrefs.HasKey("Nickname"))
+        {
+            Id.text = PlayerPrefs.GetString("Id");
+        }
     }
 
     public void OnClickMainSignUp()

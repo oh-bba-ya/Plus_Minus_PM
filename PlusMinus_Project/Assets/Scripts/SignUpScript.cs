@@ -18,11 +18,13 @@ public class SignUpScript : MonoBehaviour
         Success.SetActive(false);   
     }
 
-    // Update is called once per frame
-    void Update()
+    public void Save()
     {
-        
+        PlayerPrefs.SetString("Nickname", Nickname.text);
+        PlayerPrefs.SetString("Id", Id.text);
+        PlayerPrefs.SetString("Password", Password.text);
     }
+
 
     public void OnClickSignUp()
     {

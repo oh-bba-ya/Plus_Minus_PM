@@ -98,6 +98,9 @@ public class GameManager_GM : MonoBehaviour
         //CheckBtn.onClick.AddListener(() => OnClickCheckBtn());
         //CallBtn.onClick.AddListener(() => OnClickCallBtn());
 
+        
+        Save(2);
+
     }
 
 
@@ -171,6 +174,15 @@ public class GameManager_GM : MonoBehaviour
         isDragDrop = true;
     }
 
+    /// <summary>
+    /// 내 인덱스에 대한 player정보를 저장 
+    ///
+    /// </summary>
+    /// <param name="myindex"></param>
+    void Save(int myindex)
+    {
+        PlayerPrefs.SetInt("Money", players[myindex].money);
+    }
 
 
     /// <summary>
