@@ -6,10 +6,17 @@ using UnityEngine.UI;
 public class GameManager_GM : MonoBehaviour
 {
 
-    public int[,] arrPlayer = { { -1, -1, -1 }, { -1, -1, -1 }, { -1, -1, -1 }, { -1, -1, -1 }, { -1, -1, -1 } };            // [ total 참여 가능한 플레이어의  수 , total 받을 수 있는 카드의 수 ]  
+    public int[,] arrPlayer = { { -1, -1, -1 }, { -1, -1, -1 }, { -1, -1, -1 }, { -1, -1, -1 }, { -1, -1, -1 } };            // [[player01~05 , cards index ]  
+    public int[] signPlayer = { -1, -1, -1, -1, -1 };       // -1 일경우 플레이어가 없음 , 0 = 곱셈 , 1 = 뺄셈 , 2 = 덧셈 , 3 = 3 장의 카드가 동일 , 
+
+    /// <summary>
+    /// cardValue의 경우 cards가 스프라이트 배열이므로 각 인덱스에 해당하는 카드 숫자(ex : cards[5] = 하트 7 일 경우  cardValue[5] = 7)를 저장하는 배열.
+    /// 조커 = 0 ,
+    /// </summary>
     public int[] cardValue = { -1, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 6, 6, 6, 6, 7, 7, 7, 7, 8, 8, 8, 8, 9, 9, 9, 9, 10, 10, 10, 10, 1, 1, 1, 1, 11, 11, 11, 11, 13, 13, 13, 13, 12, 12, 12, 12 };
+    
     public int[] expressionValue = { -2, -3, -4 };          // -2 = plus , -3 = minus , -4 = mult .
-    public int curPlayer = 5;               // 현재 방에 참여한 인원.
+    public int curPlayer = 0;               // 현재 방에 참여한 인원.
     public Sprite[] cards;                  // cards[0] = 카드 뒷면.
     public Sprite[] expressions;           // +, = , * 스프라이트 저장.
 
@@ -27,7 +34,7 @@ public class GameManager_GM : MonoBehaviour
     public PlayerScript[] players;
     private float checkCount = 0;
 
-    public int myPortIndex;                    // 자신의 번호를 [0,1,2,3,4] 중 인덱스로 입력 , 카드 드래그 드랍때 정보를 바꿔주기 위해 쓸거임. , CardDrag에서도 쓰이니 꼭!!
+    public int myPortIndex = 2;                    // 자신의 번호를 [0,1,2,3,4] 중 인덱스로 입력 , 카드 드래그 드랍때 정보를 바꿔주기 위해 쓸거임. , CardDrag에서도 쓰이니 꼭!! , Distribute 에서 입력받는다.
 
 
     /// <summary>
@@ -36,7 +43,10 @@ public class GameManager_GM : MonoBehaviour
     public bool isCheckCard = false;                       
     public bool isDragDrop = false;
     public bool isChangeCard = false;                  // 카드 가운데 + , - 로 바뀜.
-    public bool isBetting = false;
+    public bool isBetting = true;                       // 카드가 공개된 후 시작이므로 changeCard()함수가 시작된 후 실행됨.
+    public bool isLeftCard = false;                    // 왼쪽 카드 공개 여부.
+    public bool isRightCard = false;                    // 오른쪽 카드 공개 여부.
+
 
 
     public int set_turnTime = 10;                // 베팅 , 카드 배치 , 카드 확인 시간 설정.
@@ -47,32 +57,44 @@ public class GameManager_GM : MonoBehaviour
     /// <summary>
     /// 베팅 버튼 변수들.
     /// </summary>
-    public Button CheckBtn;
-    public Button BBingBtn;
     public Button CallBtn;
-    public Button DDaDangBtn;
+    public Button DoubleBtn;
     public Button HalfBtn;
     public Button DieBtn;
+
+
+    int playerMoney;                    // 본인 플레이어 돈 가져와서 저장.
     
 
     int turn = 0;
     int chapter = 1;
     
     int startturn;
-    private int totalmoney = 0;
+    private int totalMoney = 0;
     List<int> MoneyLog = new List<int>();
     int Min = 10;
     int startmoney = 20; //인당
+    int betMoney = 0;
 
 
     //*********** 텍스트 변수  단계별 표시 ***********//
     public Text stepText;
+    public Text TotalText;
+    public Text betMoneyText;
+
+
 
 
 
     // Start is called before the first frame update
     void Start()
     {
+        isBetting = true;
+        betMoney = startmoney;
+        Load();           // 현재 참여한 플레이어 배열 여기다가 돈 저장해서 빼고 더하고 할거임.
+
+        
+
         for(int i = 0; i < startPos.Length; i++)
         {
             startPos[i] = originPos[i].transform.position;
@@ -82,7 +104,7 @@ public class GameManager_GM : MonoBehaviour
         int[] testplayer = { 0, 1, 2, 3, 4 };
         int[,] testcards = { { 0, 1, 2 }, { 3, 4, 5 } };
       
-        DistributeCard(curPlayer, myPortIndex, testplayer,testcards);
+        DistributeCard(curPlayer, myPortIndex, testplayer,arrPlayer,"first");
         
 
         //StartCoroutine(ClickCard(2, myPortIndex));
@@ -111,6 +133,17 @@ public class GameManager_GM : MonoBehaviour
         inGameTime += Time.deltaTime;
 
         DisplayStepByStep();
+
+
+        if (isBetting)
+        {
+            OffBetting();
+        }
+        else if (!isBetting)
+        {
+            OnBetting();
+        }
+        
 
         if (turn/curPlayer == chapter)
         {
@@ -143,7 +176,12 @@ public class GameManager_GM : MonoBehaviour
         if(isDragDrop && isChangeCard)
         {
             BackPosition();
+
         }
+
+
+        
+
     }
 
 
@@ -163,7 +201,44 @@ public class GameManager_GM : MonoBehaviour
         {
             stepText.text = "";
         }
+
+        // 현재 전체 표시
+        TotalText.text = totalMoney.ToString();
+
+        // 전 플레이어가 제시한 베팅 머니 표현
+        betMoneyText.text = betMoney.ToString();
+
+        if(!isBetting && isChangeCard)
+        {
+            stepText.text = "베팅 시작";
+        }
+        
     }
+
+    /// <summary>
+    /// 베팅 버튼 OFF;
+    /// </summary>
+    void OffBetting()
+    {
+        Debug.Log("OffBetting");
+        CallBtn.GetComponent<Button>().interactable = false;
+        HalfBtn.GetComponent<Button>().interactable = false;
+        DoubleBtn.GetComponent<Button>().interactable = false;
+        DieBtn.GetComponent<Button>().interactable = false;
+    }
+
+    /// <summary>
+    /// 베팅 버튼 ON;
+    /// </summary>
+    void OnBetting()
+    {
+        Debug.Log("OnBetting");
+        CallBtn.GetComponent<Button>().interactable = true;
+        HalfBtn.GetComponent<Button>().interactable = true;
+        DoubleBtn.GetComponent<Button>().interactable = true;
+        DieBtn.GetComponent<Button>().interactable = true;
+    }
+
 
 
     /// <summary>
@@ -176,7 +251,6 @@ public class GameManager_GM : MonoBehaviour
 
     /// <summary>
     /// 내 인덱스에 대한 player정보를 저장 
-    ///
     /// </summary>
     /// <param name="myindex"></param>
     void Save(int myindex)
@@ -184,18 +258,25 @@ public class GameManager_GM : MonoBehaviour
         PlayerPrefs.SetInt("Money", players[myindex].money);
     }
 
+    /// <summary>
+    /// Save된 각 플레이어 돈을 playerMoney 배열에 불러옴.
+    /// </summary>
+    /// <param name="myindex"></param>
+    void Load()
+    {
+        PlayerPrefs.GetInt("Money", playerMoney);
+    }
+
 
     /// <summary>
     /// 게임 시작시 모든 인원에게서 초기 베팅비를 가져옴.
     /// </summary>
     void BettingStart()
-    {
-        startturn = Random.Range(0, curPlayer - 1); // 시작지점 랜덤 지정 (구현 예정)
-
+    { 
         for (int i = 0; i < curPlayer; i++)
         {
             players[i].money -= startmoney;
-            totalmoney += startmoney;
+            totalMoney += startmoney;
         }
     }
     /// <summary>
@@ -204,122 +285,191 @@ public class GameManager_GM : MonoBehaviour
     /// <param name="in_player"> 현재 참여한 총 게임 인원 </param>
     /// <param name="myNumber"> 자기 자신의 번호 (서버에서 받아올 플레이어 정보랑 비교하기 위한것) </param>
     /// <param name="playerNumber"> 서버에서 넘어오는 플레이어들의 고유 번호 (본인것도 포함) </param>
-    /// <param name="playerCards"> 서버에서 넘어오는 플레이어들의 카드 정보 (본인것도 포함) </param>
-    void DistributeCard(int in_player,int myNumber,int[] playerNumber , int[,] playerCards)
+    /// <param name="playerCards"> 서버에서 넘어오는 플레이어들의 카드 정보 (본인것도 포함) /* 파라미터 입력대로 만들지 않고 전역변수 appPlayer를 이용해서 만들었기 때문에 만약 서버에서 카드를 나눠주는것이 온다면 코드 수정해야함. */ </param>   확인요망!!
+    /// <param name="step"> "first" = 시작하자마자 나눠줌 , "second" = 왼쪽카드 공개 , "last" = 오른쪽 카드 공개. </param>
+    void DistributeCard(int in_player,int myNumber,int[] playerNumber , int[,] playerCards, string step)
     {
         // 카드가 잘나눠지는지 확인하기 위해 앞면 카드를 배정해줬지만 발표가 끝난 후에는 카드 뒷면을 할당해줄거임.
         // 스프라이트 앞면에 해당하는 인덱스를 각 플레이어에게 할당해줄거임.
         // 뒷면 카드 확인 하기위해 mynumber = 4일때 가렸음.
 
+        Debug.Log("Distri : " + in_player);
 
         int playerIndex = 2;                // 본인의 고유정보와 , 서버에서 전달된 본인의 정보 인덱스
 
 
-        RandomCardIndex(in_player);
 
         for(int i = 0; i < in_player; i++)
         {
             if(myNumber == playerNumber[i])
             {
                 playerIndex = i;
+                myPortIndex = i;
             }
         }
 
-
-        switch (playerIndex)
+        if(step == "first")             // start 에서 시작됨. 처음 카드를 나눠줌.
         {
-            case 0:
-                for(int i = 0; i < in_player; i++)
-                {
-                    if (i < 3)
-                    {
-                        players[i+2].handcard[0].GetComponent<SpriteRenderer>().sprite = cards[arrPlayer[i, 0]];
-                        players[i+2].handcard[1].GetComponent<SpriteRenderer>().sprite = cards[arrPlayer[i, 1]];
-                        players[i+2].handcard[2].GetComponent<SpriteRenderer>().sprite = cards[arrPlayer[i, 2]];
-                    }
-                    else
-                    {
-                        players[i - 3].handcard[0].GetComponent<SpriteRenderer>().sprite = cards[arrPlayer[i, 0]];
-                        players[i - 3].handcard[1].GetComponent<SpriteRenderer>().sprite = cards[arrPlayer[i, 1]];
-                        players[i - 3].handcard[2].GetComponent<SpriteRenderer>().sprite = cards[arrPlayer[i, 2]];
-                    }
-                }
-                break;
+            RandomCardIndex(in_player);
+            for (int i = 0; i < in_player; i++)
+            {
+                players[i].handcard[0].GetComponent<SpriteRenderer>().sprite = cards[0];
+                players[i].handcard[1].GetComponent<SpriteRenderer>().sprite = cards[0];
+                players[i].handcard[2].GetComponent<SpriteRenderer>().sprite = cards[0];
+            }
 
-            case 1:
-                for(int i = 0; i < in_player; i++)
-                {
-                    if( i < 4)
-                    {
-                        players[i + 1].handcard[0].GetComponent<SpriteRenderer>().sprite = cards[arrPlayer[i , 0]];
-                        players[i + 1].handcard[1].GetComponent<SpriteRenderer>().sprite = cards[arrPlayer[i , 1]];
-                        players[i + 1].handcard[2].GetComponent<SpriteRenderer>().sprite = cards[arrPlayer[i , 2]];
-                    }
-                    else
-                    {
-                        players[i - 4].handcard[0].GetComponent<SpriteRenderer>().sprite = cards[arrPlayer[i , 0]];
-                        players[i - 4].handcard[1].GetComponent<SpriteRenderer>().sprite = cards[arrPlayer[i , 1]];
-                        players[i - 4].handcard[2].GetComponent<SpriteRenderer>().sprite = cards[arrPlayer[i , 2]];
-                    }
-                }
-                break;
-
-            case 2:
-                for (int i = 0; i < in_player; i++)
-                {
-                    players[i].handcard[0].GetComponent<SpriteRenderer>().sprite = cards[arrPlayer[i, 0]];
-                    players[i].handcard[1].GetComponent<SpriteRenderer>().sprite = cards[arrPlayer[i, 1]];
-                    players[i].handcard[2].GetComponent<SpriteRenderer>().sprite = cards[arrPlayer[i, 2]];
-
-                }
-                break;
-
-            case 3:
-                for (int i = 0; i < in_player; i++)
-                {
-                    if( i > 0)
-                    {
-                        players[i - 1].handcard[0].GetComponent<SpriteRenderer>().sprite = cards[arrPlayer[i, 0]];
-                        players[i - 1].handcard[1].GetComponent<SpriteRenderer>().sprite = cards[arrPlayer[i , 1]];
-                        players[i - 1].handcard[2].GetComponent<SpriteRenderer>().sprite = cards[arrPlayer[i , 2]];
-                    }
-                    else
-                    {
-                        players[i + 4].handcard[0].GetComponent<SpriteRenderer>().sprite = cards[arrPlayer[i , 0]];
-                        players[i + 4].handcard[1].GetComponent<SpriteRenderer>().sprite = cards[arrPlayer[i , 1]];
-                        players[i + 4].handcard[2].GetComponent<SpriteRenderer>().sprite = cards[arrPlayer[i , 2]];
-                    }
-
-                }
-                break;
-            case 4:
-                for (int i = 0; i < in_player; i++)
-                {
-                    if (i < 2)
-                    {
-                        players[i + 3].handcard[0].GetComponent<SpriteRenderer>().sprite = cards[arrPlayer[i , 0]];
-                        players[i + 3].handcard[1].GetComponent<SpriteRenderer>().sprite = cards[arrPlayer[i , 1]];
-                        players[i + 3].handcard[2].GetComponent<SpriteRenderer>().sprite = cards[arrPlayer[i , 2]];
-                    }
-                    else
-                    {
-                        players[i - 2].handcard[0].GetComponent<SpriteRenderer>().sprite = cards[0];
-                        players[i - 2].handcard[1].GetComponent<SpriteRenderer>().sprite = cards[0];
-                        players[i - 2].handcard[2].GetComponent<SpriteRenderer>().sprite = cards[0];
-                        //players[i - 2].handcard[0].GetComponent<SpriteRenderer>().sprite = cards[arrPlayer[i , 0]];
-                        //players[i - 2].handcard[1].GetComponent<SpriteRenderer>().sprite = cards[arrPlayer[i  , 1]];
-                        //players[i - 2].handcard[2].GetComponent<SpriteRenderer>().sprite = cards[arrPlayer[i , 2]];
-                    }
-
-                }
-                break;
-            default:
-                Debug.Log(" Distribute 예외 상황!!! 카드 나눠주는거 오류  확인하셈");
-                break;
-
-
-
+            
         }
+        else if(step == "second")               // 왼쪽 카드 공개.
+        {
+            Debug.Log("왼쪽 카드 공개");
+            switch (playerIndex)
+            {
+                case 0:             // player 01. 플레이어 본인 카드 외에는 
+                    for (int i = 0; i < in_player; i++)
+                    {
+                        if (i < 3)
+                        {
+                            players[i + 2].handcard[0].GetComponent<SpriteRenderer>().sprite = cards[playerCards[i, 0]];                   
+                        }
+                        else
+                        {
+                            players[i - 3].handcard[0].GetComponent<SpriteRenderer>().sprite = cards[playerCards[i, 0]];
+                        }
+                    }
+                    break;
+
+                case 1:
+                    for (int i = 0; i < in_player; i++)
+                    {
+                        if (i < 4)
+                        {
+                            players[i + 1].handcard[0].GetComponent<SpriteRenderer>().sprite = cards[playerCards[i, 0]];
+                        }
+                        else
+                        {
+                            players[i - 4].handcard[0].GetComponent<SpriteRenderer>().sprite = cards[playerCards[i, 0]];
+                        }
+                    }
+                    break;
+
+                case 2:
+                    for (int i = 0; i < in_player; i++)
+                    {
+                        players[i].handcard[0].GetComponent<SpriteRenderer>().sprite = cards[playerCards[i, 0]];
+                    }
+                    break;
+
+                case 3:
+                    for (int i = 0; i < in_player; i++)
+                    {
+                        if (i > 0)
+                        {
+                            players[i - 1].handcard[0].GetComponent<SpriteRenderer>().sprite = cards[playerCards[i, 0]];
+                        }
+                        else
+                        {
+                            players[i + 4].handcard[0].GetComponent<SpriteRenderer>().sprite = cards[playerCards[i, 0]];
+                        }
+
+                    }
+                    break;
+                case 4:
+                    for (int i = 0; i < in_player; i++)
+                    {
+                        if (i < 2)
+                        {
+                            players[i + 3].handcard[0].GetComponent<SpriteRenderer>().sprite = cards[playerCards[i, 0]];
+                        }
+                        else
+                        {
+                            players[i - 2].handcard[0].GetComponent<SpriteRenderer>().sprite = cards[playerCards[i, 0]];
+                        }
+
+                    }
+                    break;
+                default:
+                    Debug.Log(" 왼쪽 카드 공개 예외 상황!!!");
+                    break;
+
+            }
+        }
+        else if(step == "last")
+        {
+            Debug.Log("오른쪽 카드 공개");
+            switch (playerIndex)
+            {
+                case 0:             // player 01. 플레이어 본인 카드 외에는 
+                    for (int i = 0; i < in_player; i++)
+                    {
+                        if (i < 3)
+                        {
+                            players[i + 2].handcard[2].GetComponent<SpriteRenderer>().sprite = cards[playerCards[i, 2]];
+                        }
+                        else
+                        {
+                            players[i - 3].handcard[2].GetComponent<SpriteRenderer>().sprite = cards[playerCards[i, 2]];
+                        }
+                    }
+                    break;
+
+                case 1:
+                    for (int i = 0; i < in_player; i++)
+                    {
+                        if (i < 4)
+                        {
+                            players[i + 1].handcard[2].GetComponent<SpriteRenderer>().sprite = cards[playerCards[i, 2]];
+                        }
+                        else
+                        {
+                            players[i - 4].handcard[2].GetComponent<SpriteRenderer>().sprite = cards[playerCards[i, 2]];
+                        }
+                    }
+                    break;
+
+                case 2:
+                    for (int i = 0; i < in_player; i++)
+                    {
+                        players[i].handcard[2].GetComponent<SpriteRenderer>().sprite = cards[playerCards[i, 2]];
+                    }
+                    break;
+
+                case 3:
+                    for (int i = 0; i < in_player; i++)
+                    {
+                        if (i > 0)
+                        {
+                            players[i - 1].handcard[2].GetComponent<SpriteRenderer>().sprite = cards[playerCards[i, 2]];
+                        }
+                        else
+                        {
+                            players[i + 4].handcard[2].GetComponent<SpriteRenderer>().sprite = cards[playerCards[i, 2]];
+                        }
+
+                    }
+                    break;
+                case 4:
+                    for (int i = 0; i < in_player; i++)
+                    {
+                        if (i < 2)
+                        {
+                            players[i + 3].handcard[2].GetComponent<SpriteRenderer>().sprite = cards[playerCards[i, 2]];
+                        }
+                        else
+                        {
+                            players[i - 2].handcard[2].GetComponent<SpriteRenderer>().sprite = cards[playerCards[i, 2]];
+                        }
+
+                    }
+                    break;
+                default:
+                    Debug.Log("오른쪽 카드 공개 예외 상황!!!");
+                    break;
+
+            }
+        }
+
+        
 
 
 
@@ -438,7 +588,7 @@ public class GameManager_GM : MonoBehaviour
 
         for(int i = 0; i<in_player*3;i++ )
         {
-            rand01 = Random.Range(1, cards.Length);
+            rand01 = Random.Range(1, cards.Length);         
             rand02 = Random.Range(1, cards.Length);
 
             variable_temp = array_temp[rand01];
@@ -458,15 +608,6 @@ public class GameManager_GM : MonoBehaviour
             }
         }
 
-        for(int i = 0; i < players.Length; i++)
-        {
-            for(int j = 0; j < 3; j++)
-            {
-                players[i].SetPlayerCard(cards, j, 0);
-
-            }
-
-        }
         Debug.Log("card 01 : " + arrPlayer[0, 0] + ", " + arrPlayer[0, 1] + ", " + arrPlayer[0, 2]);
         Debug.Log("card 02 : " + arrPlayer[1, 0] + ", " + arrPlayer[1, 1] + ", " + arrPlayer[1, 2]);
         Debug.Log("card 03 : " + arrPlayer[2, 0] + ", " + arrPlayer[2, 1] + ", " + arrPlayer[2, 2]);
@@ -476,197 +617,114 @@ public class GameManager_GM : MonoBehaviour
         
     }
 
+    /// <summary>
+    /// 플레이어들의 가운데 부호를 처음부터 저장하는거임 , 3장의 카드가 동일하면 왼쪽카드 * 2 , 가운데가 조커면 곱셈 , 홀수면 뺄셈 , 짝수면 덧셈.
+    /// </summary>
+    /// <param name="in_player"></param>
+    void Sign(int in_player)
+    {
+        int jokerCount = 0;
+
+        for(int i = 0; i < in_player; i++)
+        {
+            // 카드 3장이 동일할경우.
+            if(cardValue[arrPlayer[i,0]] == cardValue[arrPlayer[i, 1]] && cardValue[arrPlayer[i, 0]] == cardValue[arrPlayer[i, 2]])
+            {
+                signPlayer[i] = 3;
+            }
+            else
+            {
+                
+            }
+
+            
+        }
+    }
+
+
+
+
+    /// <summary>
+    /// 콜 : 베팅만큼 베팅함
+    /// </summary>
+    public void OnClickCallBtn()
+    {
+        Debug.Log("Call");
+        totalMoney += betMoney;
+        playerMoney -= betMoney;
+    }
+
+
+    /// <summary>
+    /// 더블 : 베팅 머니에 2배를 해서 베팅함
+    /// </summary>
+    public void OnClickDoubleBtn()
+    {
+        Debug.Log("Double");
+        betMoney = betMoney * 2;
+        totalMoney += betMoney;
+    }
+
+
+    /// <summary>
+    /// 하프 버튼 : 전체 판돈의 절반을 베팅함.
+    /// </summary>
+    public void OnClickHalfBtn()
+    {
+        Debug.Log("Half");
+        betMoney = totalMoney / 2;
+        totalMoney += betMoney;
+    }
+
+
+    /// <summary>
+    /// 다이버튼 / 죽으면 뭔가 어떤 기가막힌 스프라이트로 가리고 싶음.
+    /// 조커들고 죽을시 기본판돈 만큼 베팅하고 죽음.
+    /// </summary>
+    public void OnClickDieBtn()
+    {
+        Debug.Log("Die");
+        // 가운데 플레이어 카드 뒷면으로 돌림.
+        players[2].handcard[0].GetComponent<SpriteRenderer>().sprite = cards[0];
+        players[2].handcard[1].GetComponent<SpriteRenderer>().sprite = cards[0];
+        players[2].handcard[2].GetComponent<SpriteRenderer>().sprite = cards[0];
+        
+
+        
+        if (cardValue[arrPlayer[myPortIndex,0]] == 0 || cardValue[arrPlayer[myPortIndex, 1]] == 0) cardValue[arrPlayer[myPortIndex, 02]] == 0)){
+            // 소지하고 있는 카드 3장중 조커를 한장이라도 소유하고 있을 때 죽는다면
+            totalMoney = totalMoney + ( startmoney * curPlayer);
+        }
+
+    }
+
+    void Result(int in_player , int myNumber , int[] playerNumber , int[,] playerCards)
+    {
+        int myIndex = 0;
+        int[] resultPlayer = new int[in_player];         // 플레이어들의 합산 결과.
+        int maxNumber;              // 합산 결과.
+        int maxIndex;              // 합산 결과가 가장 큰 사람의 인덱스.
+
+        for(int i = 0; i < in_player; i++)
+        {
+            if(playerNumber[i] == myNumber)
+            {
+                myIndex = i;
+            }
+            
+        }
+
+        for(int i = 0; i < in_player; i++)
+        {
+            
+        }
+    }
+    
 
 
     
 
-    // 플레
-
-
-    private void OnClickCallBtn()
-    {
-        throw new System.NotImplementedException();
-    }
-
-    private void OnClickCheckBtn()
-    {
-        throw new System.NotImplementedException();
-    }
-
-    private void OnClickDieBtn()
-    {
-        int a = turn % curPlayer - 1;
-        if (a == -1)
-        {
-            a = curPlayer - 1;
-        }
-
-        if (players[a].isDead)
-        {
-            MoneyLog.Add(0);
-            turn++;
-        }
-
-        Debug.Log("턴 : " + turn + "/ 누구 턴인지 : " + turn % curPlayer + " /몫: " + turn / curPlayer + "/ 페이즈: " + chapter);
-        players[turn % curPlayer].isDead = true;
-        players[turn % curPlayer].deadturn = turn;
-        players[turn % curPlayer].gameObject.SetActive(false);
-        turn++;
-
-        ////머니 로그는 다른 함수들에서 실행.
-    }
-
-    private void OnClickHalfBtn()
-    {
-
-        Debug.Log("턴 : " + turn + "/ 누구 턴인지 : " + turn % curPlayer + " /몫: " + turn / curPlayer + "/ 페이즈: " + chapter);
-        //내 옆 플에이어가 죽었는지 안죽었는지 확인
-        int a = turn % curPlayer - 1;
-        if (a == -1)
-        {
-            a = curPlayer - 1;
-        }
-
-        if (players[a].isDead)
-        {
-            if (players[a].deadturn / curPlayer < chapter)
-            {//같은 턴에서 죽은 사람
-                MoneyLog.Add(0);
-            }
-            else if (players[a].deadturn / curPlayer > chapter)
-            {
-                //이미 죽어있는 상태면 그 유저 무시
-                MoneyLog.Add(MoneyLog[turn - 1]);
-                turn++;
-            }
-        }
-        Debug.Log(turn);
-        if (turn > 0)
-        {
-            players[turn % curPlayer].money -= MoneyLog[turn - 1]; //전 사람이 낸만큼 먼저 냄
-            totalmoney += MoneyLog[turn - 1];
-            int half = totalmoney / 2;
-            players[turn % curPlayer].money -= half; //그 후 전체 금액의 1/4
-            totalmoney += half;
-
-            MoneyLog.Add(MoneyLog[turn - 1] + half);
-            turn++;
-
-        }
-
-        else
-        {
-            Debug.Log("선택 불가");
-        }
-
-        //    Debug.Log("턴: " + turn + "총 금액 : " + totalmoney + "전 사람 금액 : " + MoneyLog[turn - 2]);
-    }
-
-    private void OnClickQuaterBtn()
-    {
-
-        Debug.Log("턴 : " + turn + "/ 누구 턴인지 : " + turn % curPlayer + " /몫: " + turn / curPlayer + "/ 페이즈: " + chapter);
-        int a = turn % curPlayer - 1;
-        if (a == -1)
-        {
-            a = curPlayer - 1;
-        }
-        
-        if (players[a].isDead)
-        {
-            if (players[a].deadturn / curPlayer < chapter)
-            {//같은 턴에서 죽은 사람
-                MoneyLog.Add(0);
-            }
-            else if (players[a].deadturn / curPlayer > chapter)
-            {
-                //이미 죽어있는 상태면 그 유저 무시
-                MoneyLog.Add(MoneyLog[turn - 1]);
-                turn++;
-            }
-        }
-
-        Debug.Log(turn);
-        if (turn > 0)
-        {
-            players[turn % curPlayer].money -= MoneyLog[turn - 1]; //전 사람이 낸만큼 먼저 냄
-            totalmoney += MoneyLog[turn - 1];
-
-            int quarter = totalmoney / 4;//그 후 전체 금액의 1/4
-            players[turn % curPlayer].money -= quarter;
-            totalmoney += quarter;
-
-            MoneyLog.Add(MoneyLog[turn - 1] + quarter);
-            turn++;
-        }
-
-        else
-        {
-            Debug.Log("선택 불가");
-        }
-
-        //Debug.Log("턴: " + turn + "총 금액 : " + totalmoney + "전 사람 금액 : " + MoneyLog[turn - 2]);
-
-    }
-
-    private void OnClickDoubleBtn()
-    {
-
-        Debug.Log("턴 : " + turn + "/ 누구 턴인지 : " + turn % curPlayer + " /몫: " + turn / curPlayer + "/ 페이즈: " + chapter);
-
-        int a = turn % curPlayer - 1;
-        if (a == -1)
-        {
-            a = curPlayer - 1;
-        }
-
-        if (players[a].isDead)
-        {
-            if (players[a].deadturn / curPlayer < chapter)
-            {//같은 턴에서 죽은 사람
-                MoneyLog.Add(0);
-            }
-            else if (players[a].deadturn / curPlayer > chapter)
-            {
-                //이미 죽어있는 상태면 그 유저 무시
-                MoneyLog.Add(MoneyLog[turn - 1]);
-                turn++;
-            }
-        }
-        if (turn > 0)
-        {
-            players[turn % curPlayer].money -= 2 * MoneyLog[turn - 1];
-            MoneyLog.Add(2 * MoneyLog[turn - 1]);
-            totalmoney += MoneyLog[turn];
-            turn++;
-        }
-        else
-        {
-            Debug.Log("선택 불가");
-        }
-        //Debug.Log("턴: " + turn + "총 금액 : " + totalmoney + "전 사람 금액 : " + MoneyLog[turn - 2]);
-
-    }
-
-    private void OnClickFirstBtn()
-    {
-
-        Debug.Log("턴 : " + turn + "/ 누구 턴인지 : " + turn % curPlayer+ " /몫: "+turn/curPlayer+"/ 페이즈: "+chapter);
-
-        if (turn % curPlayer == 0)
-        {
-            MoneyLog.Add(Min);
-            players[turn % curPlayer].money -= MoneyLog[turn];
-            totalmoney += MoneyLog[turn];
-            turn++;
-            
-        }
-        else
-        {
-            Debug.Log("선택할 수 없습니다.");
-        }
-        //Debug.Log("턴: " + turn + " 총 금액 : " + totalmoney + " 전 사람 금액 : 없음");
-    }
+   
 
 }
     

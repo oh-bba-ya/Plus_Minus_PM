@@ -58,6 +58,7 @@ public class CardDrag : MonoBehaviour
         if(GM.isDragDrop)
         {
             ChangeCenter(GM.myPortIndex);
+            
 
         }
 
@@ -72,32 +73,37 @@ public class CardDrag : MonoBehaviour
     /// 카드 확인 , 카드 배치 (드래그) 가 끝나면 가운데 카드 부호가 결정되며 부호 공개됨 /
     /// 어차피 모든 플레이어는 player03 오브젝트 위치에 자기 자신의 카드가 위치하므로 CardDrag.cs 에 함수를 작성함.
     /// </summary>
-    /// <param name="myNumber"> 나의 포트 번호</param>
+    /// <param name="myNumber"> 나의 인덱스 번호 </param>
     void ChangeCenter(int myNumber)
     {
         // 일단 카드 부호들 스프라이트가 없어서 뒷면으로 대체함.
         // GameManager_GM.cs에 존재하는 arrPlayer의 정보는 배팅이 끝나고 결과 공개 때 바꾸면되므로 굳이 여기서 바꾸지 않음.
         
-        if (GM.cardValue[GM.arrPlayer[myNumber, 1] % 2] == 0)   // 짝수        // arrplayer에 있는것은 스프라이트 인덱스이다. 
+
+        if(GM.cardValue[GM.arrPlayer[myNumber, 1]] == 0)            // 조커일경우.
+        {
+            //playerCardPos[1].GetComponent<SpriteRenderer>().sprite = GM.expressions[2];
+
+            playerCardPos[1].GetComponent<SpriteRenderer>().sprite = GM.cards[0];
+        }
+        else if (GM.cardValue[GM.arrPlayer[myNumber, 1] % 2] == 0)   // 짝수        // arrplayer에 있는것은 스프라이트 인덱스이다. 
         {
             //playerCardPos[1].GetComponent<SpriteRenderer>().sprite = GM.expressions[0];
+  
             playerCardPos[1].GetComponent<SpriteRenderer>().sprite = GM.cards[0];
 
         }
         else if (GM.cardValue[GM.arrPlayer[myNumber, 1] % 2] != 0)   // 홀수
         {
             //playerCardPos[1].GetComponent<SpriteRenderer>().sprite = GM.expressions[1];
+
             playerCardPos[1].GetComponent<SpriteRenderer>().sprite = GM.cards[0];
 
         }
-        else   // 조커 , 곱셈.
-        {
-            //playerCardPos[1].GetComponent<SpriteRenderer>().sprite = GM.expressions[2];
-            playerCardPos[1].GetComponent<SpriteRenderer>().sprite = GM.cards[0];
 
-        }
 
         GM.isChangeCard = true;         // 가운데 카드 이미지 변환 완료.
+        GM.isBetting = false;           // 베팅 시작.
     }
 
 
