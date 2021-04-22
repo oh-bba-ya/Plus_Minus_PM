@@ -7,7 +7,7 @@ public class GameManager_GM : MonoBehaviour
 {
 
     public int[,] arrPlayer = { { -1, -1, -1 }, { -1, -1, -1 }, { -1, -1, -1 }, { -1, -1, -1 }, { -1, -1, -1 } };            // [[player01~05 , cards index ]  
-    public int[] signPlayer = { -1, -1, -1, -1, -1 };       // -1 일경우 플레이어가 없음 , 0 = 곱셈 , 1 = 뺄셈 , 2 = 덧셈 , 3 = 3 장의 카드가 동일 , 
+    public int[] resultPlayer = { -1, -1, -1, -1, -1 };       // 플레이어들의 결과 합산 저장 변수. 
 
     /// <summary>
     /// cardValue의 경우 cards가 스프라이트 배열이므로 각 인덱스에 해당하는 카드 숫자(ex : cards[5] = 하트 7 일 경우  cardValue[5] = 7)를 저장하는 배열.
@@ -85,6 +85,7 @@ public class GameManager_GM : MonoBehaviour
 
 
 
+    int[] testplayer = { 0, 1, 2, 3, 4 };
 
     // Start is called before the first frame update
     void Start()
@@ -101,8 +102,8 @@ public class GameManager_GM : MonoBehaviour
             
         }
 
-        int[] testplayer = { 0, 1, 2, 3, 4 };
-        int[,] testcards = { { 0, 1, 2 }, { 3, 4, 5 } };
+        //int[] testplayer = { 0, 1, 2, 3, 4 };
+        //int[,] testcards = { { 0, 1, 2 }, { 3, 4, 5 } };
       
         DistributeCard(curPlayer, myPortIndex, testplayer,arrPlayer,"first");
         
@@ -176,6 +177,9 @@ public class GameManager_GM : MonoBehaviour
         if(isDragDrop && isChangeCard)
         {
             BackPosition();
+            DistributeCard(curPlayer, myPortIndex, testplayer, arrPlayer, "second");
+            DistributeCard(curPlayer, myPortIndex, testplayer, arrPlayer, "last");
+            ResultNumber(curPlayer, myPortIndex, testplayer, arrPlayer);
 
         }
 
@@ -617,29 +621,7 @@ public class GameManager_GM : MonoBehaviour
         
     }
 
-    /// <summary>
-    /// 플레이어들의 가운데 부호를 처음부터 저장하는거임 , 3장의 카드가 동일하면 왼쪽카드 * 2 , 가운데가 조커면 곱셈 , 홀수면 뺄셈 , 짝수면 덧셈.
-    /// </summary>
-    /// <param name="in_player"></param>
-    void Sign(int in_player)
-    {
-        int jokerCount = 0;
 
-        for(int i = 0; i < in_player; i++)
-        {
-            // 카드 3장이 동일할경우.
-            if(cardValue[arrPlayer[i,0]] == cardValue[arrPlayer[i, 1]] && cardValue[arrPlayer[i, 0]] == cardValue[arrPlayer[i, 2]])
-            {
-                signPlayer[i] = 3;
-            }
-            else
-            {
-                
-            }
-
-            
-        }
-    }
 
 
 
@@ -691,14 +673,23 @@ public class GameManager_GM : MonoBehaviour
         
 
         
-        if (cardValue[arrPlayer[myPortIndex,0]] == 0 || cardValue[arrPlayer[myPortIndex, 1]] == 0) cardValue[arrPlayer[myPortIndex, 02]] == 0)){
-            // 소지하고 있는 카드 3장중 조커를 한장이라도 소유하고 있을 때 죽는다면
+        if (cardValue[arrPlayer[myPortIndex,0]] == 0 || cardValue[arrPlayer[myPortIndex, 1]] == 0 || cardValue[arrPlayer[myPortIndex, 02]] == 0){
+            // 소지하고 있는 카드 3장중 조커를 한장이라도 소유하고 있을 때 죽는다면 기본 판돈 2배 주고 죽음.
             totalMoney = totalMoney + ( startmoney * curPlayer);
         }
 
     }
 
-    void Result(int in_player , int myNumber , int[] playerNumber , int[,] playerCards)
+
+    /// <summary>
+    /// 플레이어 들의 3장의 카드 합산 결과를 저장하는 함수 
+    /// 카드를 부여 받고 난 후 플레이어들의 카드 결과는 정해짐.
+    /// </summary>
+    /// <param name="in_player"> 현재 게임에 참여한 인원 </param>
+    /// <param name="myNumber"> 자신의 포트 번호 </param>
+    /// <param name="playerNumber"> 전체 플레이어(본인 포함) 포트 번호 </param>
+    /// <param name="playerCards"> 전체 플레이어(본인 포함) 카드 번호</param>
+    void ResultNumber(int in_player , int myNumber , int[] playerNumber , int[,] playerCards)
     {
         int myIndex = 0;
         int[] resultPlayer = new int[in_player];         // 플레이어들의 합산 결과.
@@ -716,8 +707,116 @@ public class GameManager_GM : MonoBehaviour
 
         for(int i = 0; i < in_player; i++)
         {
+            // 트리플일 경우. 왼쪽카드 * 2
+            if(arrPlayer[i,0] == arrPlayer[i,1] && arrPlayer[i,0] == arrPlayer[i, 2]) {
+                resultPlayer[i] = cardValue[arrPlayer[i, 0]] * 2;
             
+            }
+            else
+            {
+                // 조커를 한장이라도 가지고 있다면.
+                if (cardValue[arrPlayer[i, 0]] == 0 || cardValue[arrPlayer[i, 1]] == 0 || cardValue[arrPlayer[i, 0]] == 0)
+                {
+                    // 조커 카드가 가운데에 존재하는 경우
+                    if (cardValue[arrPlayer[i, 1]] == 0)
+                    {
+                        // 조커 카드가 가운데에 존재하고 왼쪽에도 존재하는 경우
+                        if (cardValue[arrPlayer[i, 0]] == 0)
+                        {
+                            resultPlayer[i] = cardValue[arrPlayer[i, 2]] * cardValue[arrPlayer[i, 2]];
+                        }
+                        // 조커 카드가 가운데에 존재하고 오른쪽에도 존재하는 경우
+                        else if (cardValue[arrPlayer[i, 2]] == 0)
+                        {
+                            resultPlayer[i] = cardValue[arrPlayer[i, 0]] * cardValue[arrPlayer[i, 0]];
+                        }
+                        // 가운데에만 존재하는경우
+                        else
+                        {
+                            resultPlayer[i] = cardValue[arrPlayer[i, 0]] * cardValue[arrPlayer[i, 2]];
+                        }
+                    }
+                    // 조커 카드가 가운데에 없는 경우.
+                    else
+                    {
+                        // 조커 카드 2장이 왼쪽 오른쪽 각각에 존재할 경우.
+                        if (cardValue[arrPlayer[i, 0]] == 0 && cardValue[arrPlayer[i, 2]] == 0)
+                        {
+                            resultPlayer[i] = 0;
+                        }
+                        // 조커 카드가 왼쪽에만 존재할 경우.
+                        else if(cardValue[arrPlayer[i, 0]] == 0)
+                        {
+                            // 조커 카드를 제외한 나머지 2장이 같은 숫자의 카드 일 경우.
+                            if(cardValue[arrPlayer[i, 1]]== cardValue[arrPlayer[i, 2]])
+                            {
+                                resultPlayer[i] = cardValue[arrPlayer[i, 0]] * 2;
+                            }
+                            // 조커 카드를 제외하고 2장의 카드 숫자가 다를 경우.
+                            else
+                            {
+                                // 가운데 카드가 홀수 일경우.
+                                if( cardValue[arrPlayer[i, 1]] % 2 != 0)
+                                {
+                                    resultPlayer[i] = 0;
+                                }
+                                // 가운데 카드가 짝수 일경우.
+                                else
+                                {
+                                    resultPlayer[i] = cardValue[arrPlayer[i, 2]] * 2;
+                                }
+
+                            }
+                        }
+                        // 조커 카드가 오른쪽에만 존재할 경우.
+                        else if (cardValue[arrPlayer[i, 2]] == 0)
+                        {
+                            // 조커 카드를 제외한 나머지 2장이 같은 숫자의 카드 일 경우.
+                            if (cardValue[arrPlayer[i, 0]] == cardValue[arrPlayer[i, 1]])
+                            {
+                                resultPlayer[i] = cardValue[arrPlayer[i, 0]] * 2;
+                            }
+                            // 조커 카드를 제외하고 2장의 카드 숫자가 다를 경우.
+                            else
+                            {
+                                // 가운데 카드가 홀수 일경우.
+                                if (cardValue[arrPlayer[i, 1]] % 2 != 0)
+                                {
+                                    resultPlayer[i] = 0;
+                                }
+                                // 가운데 카드가 짝수 일경우.
+                                else
+                                {
+                                    resultPlayer[i] = cardValue[arrPlayer[i, 0]] * 2;
+                                }
+
+                            }
+                        }
+                    }
+
+                }
+                // 조커 카드가 한장이라도 존재하지 않을 경우.
+                else
+                {
+                    // 가운데 카드가 홀수 일경우.
+                    if (cardValue[arrPlayer[i, 1]] % 2 != 0)
+                    {
+                        resultPlayer[i] = cardValue[arrPlayer[i, 0]] - cardValue[arrPlayer[i, 2]];
+                    }
+                    // 가운데 카드가 짝수 일경우.
+                    else
+                    {
+                        resultPlayer[i] = cardValue[arrPlayer[i, 0]] + cardValue[arrPlayer[i, 2]];
+                    }
+                }
+            }
         }
+
+        Debug.Log("player01 result : " + resultPlayer[0]);
+        Debug.Log("player01 result : " + resultPlayer[1]);
+        Debug.Log("player01 result : " + resultPlayer[2]);
+        Debug.Log("player01 result : " + resultPlayer[3]);
+        Debug.Log("player01 result : " + resultPlayer[4]);
     }
     
 
