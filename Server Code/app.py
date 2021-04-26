@@ -32,7 +32,7 @@ def login():
     if pmuser.password != password :
         return "Failed"
     else :
-        return "Success"
+        return {"result" : "success", "money", pmuser.money}
 
 if __name__ == "__main__":
     basedir = os.path.abspath(os.path.dirname(__file__))
