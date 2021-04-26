@@ -14,4 +14,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/SignUp.unity
     guid: 3c1670768515f4a428c992c519834b47
+  - enabled: 1
+    path: Assets/Scenes/Matching.unity
+    guid: 8c5cf2531903e124d999f340a28992ac
   m_configObjects: {}

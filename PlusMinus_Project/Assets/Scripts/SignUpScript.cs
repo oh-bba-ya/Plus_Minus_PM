@@ -41,6 +41,7 @@ public class SignUpScript : MonoBehaviour
         PlayerPrefs.SetString("Nickname", Nickname.text);
         PlayerPrefs.SetString("Id", Id.text);
         PlayerPrefs.SetString("Password", Password.text);
+        PlayerPrefs.SetInt("Money", 100000);
     }
 
 

@@ -8,11 +8,11 @@ app = Flask(__name__)
 
 @app.route('/register', methods=['GET','POST'])
 def register():
-    userid = request.form.get('userid') 
+    userid = request.form.get('userid')
     username = request.form.get('username')
     password = request.form.get('password')
 
-    pmuser = PMUser()     
+    pmuser = PMUser()
     pmuser.password = password
     pmuser.userid = userid
     pmuser.username = username
@@ -20,19 +20,31 @@ def register():
 
     db.session.add(pmuser)
     db.session.commit()
-    
+
     return "Success"
 
 @app.route('/login', methods=['GET','POST'])
 def login():
-    userid = request.form.get('userid') 
+    userid = request.form.get('userid')
     password = request.form.get('password')
 
     pmuser = PMUser.query.filter_by(userid=userid).first()
     if pmuser.password != password :
-        return "Failed"
+        return {"result" : "Success", "nickname" : "none", "money" : 0}
     else :
-        return {"result" : "success", "money", pmuser.money}
+        return {"result" : "Success", "nickname" : pmuser.username, "money" : pmuser.money}
+
+@app.route('/refresh', methods=['GET','POST'])
+def refresh():
+    userid = request.form.get('userid')
+    money = request.form.get('money')
+
+    pmuser = PMUser.query.filter_by(userid=userid).first()
+    pmuser.money = money
+
+    db.session.commit()
+    return "Success"
+
 
 if __name__ == "__main__":
     basedir = os.path.abspath(os.path.dirname(__file__))
@@ -45,4 +57,4 @@ if __name__ == "__main__":
     db.app = app
     db.create_all()
 
-    app.run(host='0.0.0.0', port=5000, debug=True) 
+    app.run(host='0.0.0.0', port=5000, debug=True)

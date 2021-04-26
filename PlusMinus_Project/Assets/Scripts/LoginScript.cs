@@ -4,6 +4,15 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using UnityEngine.Networking;
+
+[System.Serializable]
+public class ResultForm
+{
+    public string result;
+    public string nickname;
+    public int money;
+}
+
 public class LoginScript : MonoBehaviour
 {
     public InputField Id;
@@ -12,7 +21,7 @@ public class LoginScript : MonoBehaviour
     public Button Main_SignUp;
 
     private bool requestFinish = false;
-    private string result;
+    private string resultString;
     // Start is called before the first frame update
     void Start()
     {
@@ -25,9 +34,16 @@ public class LoginScript : MonoBehaviour
         Load();
         if (requestFinish)
         {
-            if (result.Equals("Success"))
+            ResultForm result = JsonUtility.FromJson<ResultForm>(resultString);
+
+            if (result.result.Equals("Success"))
             {
-                print("성공");
+                print("닉네임 : " + result.nickname + "돈 : " + result.money);
+                PlayerPrefs.SetString("Id", Id.text);
+                PlayerPrefs.SetString("Password", Password.text);
+                PlayerPrefs.SetString("Nickname", result.nickname);
+                PlayerPrefs.SetInt("Money", result.money);
+                SceneManager.LoadScene("Matching");
             }
             else
             {
@@ -50,7 +66,7 @@ public class LoginScript : MonoBehaviour
         UnityWebRequest webRequest = UnityWebRequest.Post("http://pm.dalae37.com:5000/login", form);
         yield return webRequest.SendWebRequest();
 
-        result = webRequest.downloadHandler.text;
+        resultString = webRequest.downloadHandler.text;
         requestFinish = true;
     }
     #endregion
