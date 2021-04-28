@@ -12,9 +12,6 @@ public class PlayerScript : MonoBehaviour
     public int money = 10000;
     public bool isDead = false;
     public int deadturn = 0;
-    
-    // Start is called before the first frame update
-
 
     /*
      * para : cards; 카드 스프라이트 리스트/ pcard; player가 가지고 있는 카드 인덱스/ deck: 카드 리스트에서 설정하고 싶은 인덱스

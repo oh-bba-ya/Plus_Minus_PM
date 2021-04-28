@@ -4,15 +4,41 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.Networking;
 using socket.io;
-
+using Newtonsoft.Json;
 [System.Serializable]
 public class RequestForm
 {
     public string nickname;
 }
+
+[System.Serializable]
+public class PickResponseForm
+{
+    public int yourTurn;
+}
+
+[System.Serializable]
+public class CardResponseForm
+{
+    public List<List<int>> arrPlayer = new List<List<int>>();
+}
+
 public class ServerManager : MonoBehaviour
 {
+    public static ServerManager instance;
     Socket socket;
+
+    private void Awake()
+    {
+        if (instance != null)
+            Destroy(gameObject);
+        else
+        {
+            DontDestroyOnLoad(gameObject);
+            instance = this;
+        }
+    }
+
     // Start is called before the first frame update
     void Start()
     {
@@ -22,9 +48,12 @@ public class ServerManager : MonoBehaviour
             print("서버 연결");
             EmitJoin();
         });
-
         socket.On("join", OnJoin);
         socket.On("pick", OnPick);
+        socket.On("gameReady", OnGameReady);
+        socket.On("batting", OnBatting);
+        socket.On("gameEnd", OnGameEnd);
+        socket.On("destory", OnDestroyRoom);
     }
 
     void EmitJoin()
@@ -45,6 +74,7 @@ public class ServerManager : MonoBehaviour
         if (socket.IsConnected)
         {
             print("매칭 실시");
+
             RequestForm request = new RequestForm();
             request.nickname = PlayerPrefs.GetString("Nickname");
             socket.EmitJson("pick", JsonUtility.ToJson(request));
@@ -54,6 +84,49 @@ public class ServerManager : MonoBehaviour
     void OnPick(string json)
     {
         SceneManager.LoadScene("InGame");
+        PickResponseForm form = JsonUtility.FromJson<PickResponseForm>(json);
+
+        print("내 차례는" + form.yourTurn + "입니다");
+
+        GameObject.Find("GameManagaer").GetComponent<GameManager_GM>().SetMyPortIndex(form.yourTurn);
+    }
+
+    public void EmitGameReady()
+    {
+        socket.Emit("gameReady");
+    }
+
+    void OnGameReady(string json)
+    {
+        for(int i=0;i<5; i++)
+        {
+            for(int j=0; j<3; j++)
+            {
+                CardResponseForm form = JsonConvert.DeserializeObject<CardResponseForm>(json);
+                GameObject.Find("GameManagaer").GetComponent<GameManager_GM>().arrPlayer[i, j] = form.arrPlayer[i][j];
+            }
+        }
+    }
+
+    public void EmitBatting(int turnIndex, int battingMoney)
+    {
+        string json = "";
+        socket.EmitJson("batting", json);
+    }
+
+    void OnBatting(string json)
+    {
+
+    }
+
+    void OnGameEnd(string json)
+    {
+        RefreshMoney();
+    }
+
+    void OnDestroyRoom(string json)
+    {
+        SceneManager.LoadScene("Matching");
     }
 
     #region 돈 업데이트
