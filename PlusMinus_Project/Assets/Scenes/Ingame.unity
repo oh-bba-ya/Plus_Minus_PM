@@ -167,7 +167,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   resultPlayer: ffffffffffffffffffffffffffffffffffffffff
-  cardValue: ffffffff02000000020000000200000002000000030000000300000003000000030000000400000004000000040000000400000005000000050000000500000005000000060000000600000006000000060000000700000007000000070000000700000008000000080000000800000008000000090000000900000009000000090000000a0000000a0000000a0000000a000000010000000100000001000000010000000b0000000b0000000b0000000b0000000d0000000d0000000d0000000d0000000c0000000c0000000c0000000c000000
+  cardValue: ffffffff0100000002000000030000000400000005000000060000000700000008000000090000000a0000000b0000000c0000000d0000000100000002000000030000000400000005000000060000000700000008000000090000000a0000000b0000000c0000000d0000000100000002000000030000000400000005000000060000000700000008000000090000000a0000000b0000000c0000000d0000000100000002000000030000000400000005000000060000000700000008000000090000000a0000000b0000000c0000000d000000
   expressionValue: 010000000200000003000000
   curPlayer: 5
   cards:
@@ -191,7 +191,6 @@ MonoBehaviour:
   - {fileID: 21300000, guid: b95ae84aafcf00a4bab66cf03d6e59f5, type: 3}
   - {fileID: 21300000, guid: 7384f95fb7711a94e888a0ff5ec52085, type: 3}
   - {fileID: 21300000, guid: 09053da1a046a234e8ad618f140e309c, type: 3}
-  - {fileID: 21300000, guid: 9e157cbc40c0cec4893980701db5f0b1, type: 3}
   - {fileID: 21300000, guid: 9e157cbc40c0cec4893980701db5f0b1, type: 3}
   - {fileID: 21300000, guid: 7c9f553fe8a424240abc10480b3e69ec, type: 3}
   - {fileID: 21300000, guid: 8fb608645d4af4f49a87c9ea6e39ff26, type: 3}
@@ -226,9 +225,9 @@ MonoBehaviour:
   - {fileID: 21300000, guid: 2e58785089ed2474eab12b8269700f0b, type: 3}
   - {fileID: 21300000, guid: cb186d1e73e62eb4fb441e53ff2269e4, type: 3}
   expressions:
-  - {fileID: 21300000, guid: 4f3941d643dbaf648b33eee6c6759e1e, type: 3}
-  - {fileID: 21300000, guid: 4f3941d643dbaf648b33eee6c6759e1e, type: 3}
-  - {fileID: 21300000, guid: 4f3941d643dbaf648b33eee6c6759e1e, type: 3}
+  - {fileID: 21300000, guid: a1a29c60b0cc3a34998a8d204f3f6c04, type: 3}
+  - {fileID: 21300000, guid: 50779e13e73e1bf41aa4153421c2b4af, type: 3}
+  - {fileID: 21300000, guid: 59b353c52467bcc4984cde71c161c874, type: 3}
   originPos:
   - {fileID: 1045002432}
   - {fileID: 90710238}
@@ -255,6 +254,10 @@ MonoBehaviour:
   stepText: {fileID: 118179257}
   TotalText: {fileID: 1208221199}
   betMoneyText: {fileID: 1442908604}
+  playerBetTime: 10
+  totalMoney: 0
+  startmoney: 20
+  betMoney: 0
 --- !u!1 &86506205
 GameObject:
   m_ObjectHideFlags: 0
@@ -302,9 +305,10 @@ GameObject:
   - component: {fileID: 90710242}
   - component: {fileID: 90710241}
   - component: {fileID: 90710240}
+  - component: {fileID: 90710243}
   m_Layer: 0
-  m_Name: player01_center
-  m_TagString: player01_center
+  m_Name: player03_center
+  m_TagString: player03_center
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -333,7 +337,7 @@ BoxCollider2D:
   m_Enabled: 1
   m_Density: 1
   m_Material: {fileID: 0}
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_UsedByEffector: 0
   m_UsedByComposite: 0
   m_Offset: {x: 0, y: 0}
@@ -421,6 +425,19 @@ SpriteRenderer:
   m_WasSpriteAssigned: 0
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &90710243
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 90710238}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2b1fc0556f4455244b30d65c14827a4b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  GM: {fileID: 32582472}
 --- !u!1 &114534170
 GameObject:
   m_ObjectHideFlags: 0
@@ -434,8 +451,8 @@ GameObject:
   - component: {fileID: 114534173}
   - component: {fileID: 114534172}
   m_Layer: 0
-  m_Name: player01_center
-  m_TagString: player01_center
+  m_Name: player05_center
+  m_TagString: player05_center
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1293,8 +1310,8 @@ GameObject:
   - component: {fileID: 588387352}
   - component: {fileID: 588387351}
   m_Layer: 0
-  m_Name: player01_center
-  m_TagString: player01_center
+  m_Name: player04_center
+  m_TagString: player04_center
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1665,8 +1682,8 @@ GameObject:
   - component: {fileID: 688813963}
   - component: {fileID: 688813962}
   m_Layer: 0
-  m_Name: player01_center
-  m_TagString: player01_center
+  m_Name: player02_center
+  m_TagString: player02_center
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1901,7 +1918,7 @@ GameObject:
   - component: {fileID: 780306147}
   m_Layer: 0
   m_Name: player01_right
-  m_TagString: player01_right
+  m_TagString: player05_right
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -2031,8 +2048,8 @@ GameObject:
   - component: {fileID: 944286256}
   - component: {fileID: 944286255}
   m_Layer: 0
-  m_Name: player01_left
-  m_TagString: player01_left
+  m_Name: player02_left
+  m_TagString: player02_left
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -2162,8 +2179,8 @@ GameObject:
   - component: {fileID: 976970059}
   - component: {fileID: 976970058}
   m_Layer: 0
-  m_Name: player01_left
-  m_TagString: player01_left
+  m_Name: player05_left
+  m_TagString: player05_left
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -2293,8 +2310,8 @@ GameObject:
   - component: {fileID: 1021701472}
   - component: {fileID: 1021701471}
   m_Layer: 0
-  m_Name: player01_left
-  m_TagString: player01_left
+  m_Name: player04_left
+  m_TagString: player04_left
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -2423,9 +2440,10 @@ GameObject:
   - component: {fileID: 1045002436}
   - component: {fileID: 1045002435}
   - component: {fileID: 1045002434}
+  - component: {fileID: 1045002437}
   m_Layer: 0
-  m_Name: player01_left
-  m_TagString: player01_left
+  m_Name: player03_left
+  m_TagString: player03_left
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -2454,7 +2472,7 @@ BoxCollider2D:
   m_Enabled: 1
   m_Density: 1
   m_Material: {fileID: 0}
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_UsedByEffector: 0
   m_UsedByComposite: 0
   m_Offset: {x: 0, y: 0}
@@ -2542,6 +2560,19 @@ SpriteRenderer:
   m_WasSpriteAssigned: 0
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &1045002437
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1045002432}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2b1fc0556f4455244b30d65c14827a4b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  GM: {fileID: 32582472}
 --- !u!1 &1073665331
 GameObject:
   m_ObjectHideFlags: 0
@@ -2763,8 +2794,8 @@ GameObject:
   - component: {fileID: 1231425057}
   - component: {fileID: 1231425056}
   m_Layer: 0
-  m_Name: player01_right
-  m_TagString: player01_right
+  m_Name: player02_right
+  m_TagString: player02_right
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -3367,9 +3398,10 @@ GameObject:
   - component: {fileID: 1570072102}
   - component: {fileID: 1570072101}
   - component: {fileID: 1570072100}
+  - component: {fileID: 1570072103}
   m_Layer: 0
-  m_Name: player01_right
-  m_TagString: player01_right
+  m_Name: player03_right
+  m_TagString: player03_right
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -3398,7 +3430,7 @@ BoxCollider2D:
   m_Enabled: 1
   m_Density: 1
   m_Material: {fileID: 0}
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_UsedByEffector: 0
   m_UsedByComposite: 0
   m_Offset: {x: 0, y: 0}
@@ -3486,6 +3518,19 @@ SpriteRenderer:
   m_WasSpriteAssigned: 0
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &1570072103
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1570072098}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2b1fc0556f4455244b30d65c14827a4b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  GM: {fileID: 32582472}
 --- !u!1 &1603958603
 GameObject:
   m_ObjectHideFlags: 0
@@ -3632,8 +3677,8 @@ GameObject:
   - component: {fileID: 1619339226}
   - component: {fileID: 1619339225}
   m_Layer: 0
-  m_Name: player01_right
-  m_TagString: player01_right
+  m_Name: player04_right
+  m_TagString: player04_right
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

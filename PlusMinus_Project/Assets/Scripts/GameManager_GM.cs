@@ -15,7 +15,7 @@ public class GameManager_GM : MonoBehaviour
     /// cardValue의 경우 cards가 스프라이트 배열이므로 각 인덱스에 해당하는 카드 숫자(ex : cards[5] = 하트 7 일 경우  cardValue[5] = 7)를 저장하는 배열.
     /// 조커 = 0 ,
     /// </summary>
-    public int[] cardValue = { -1, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 6, 6, 6, 6, 7, 7, 7, 7, 8, 8, 8, 8, 9, 9, 9, 9, 10, 10, 10, 10, 1, 1, 1, 1, 11, 11, 11, 11, 13, 13, 13, 13, 12, 12, 12, 12 };
+    public int[] cardValue = { -1, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ,11, 12, 13, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13 , 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13 };
 
     public int[] expressionValue = { -2, -3, -4 };          // -2 = plus , -3 = minus , -4 = mult .
     public int curPlayer = 0;               // 현재 방에 참여한 인원.
@@ -36,7 +36,7 @@ public class GameManager_GM : MonoBehaviour
     public PlayerScript[] players;
     private float checkCount = 0;
 
-    public int myPortIndex = 2;                    // 자신의 번호를 [0,1,2,3,4] 중 인덱스로 입력 , 카드 드래그 드랍때 정보를 바꿔주기 위해 쓸거임. , CardDrag에서도 쓰이니 꼭!! , Distribute 에서 입력받는다.
+    public int myPortIndex;                    // 자신의 번호를 [0,1,2,3,4] 중 인덱스로 입력 , 카드 드래그 드랍때 정보를 바꿔주기 위해 쓸거임. , CardDrag에서도 쓰이니 꼭!! , Distribute 에서 입력받는다.
 
     /// <summary>
     /// bool isCheckCard , DragDrop , ChangeCard 들은 각 행동이 끝나면 true 로 전환.
@@ -87,6 +87,7 @@ public class GameManager_GM : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        
         isBetting = true;
         betMoney = startmoney;
         Load();           // 현재 참여한 플레이어 배열 여기다가 돈 저장해서 빼고 더하고 할거임.
@@ -142,13 +143,14 @@ public class GameManager_GM : MonoBehaviour
         if (isCheckCard && inGameTime >= set_turnTime)           // 카드 확인도 하고 , 시간초과일때 드래그 스왑 종료.
         {
             OFFCardDrag();
+            DistributeCard(curPlayer, myPortIndex, testplayer, arrPlayer, "second");
         }
 
         if (isDragDrop && isChangeCard)
         {
             BackPosition();
-            //DistributeCard(curPlayer, myPortIndex, testplayer, arrPlayer, "second");
-            //DistributeCard(curPlayer, myPortIndex, testplayer, arrPlayer, "last");
+            DistributeCard(curPlayer, myPortIndex, testplayer, arrPlayer, "third");
+            DistributeCard(curPlayer, myPortIndex, testplayer, arrPlayer, "last");
             ResultNumber(curPlayer, myPortIndex, testplayer, arrPlayer);
 
         }
@@ -288,7 +290,7 @@ public class GameManager_GM : MonoBehaviour
     /// <param name="myNumber"> 자기 자신의 번호 (서버에서 받아올 플레이어 정보랑 비교하기 위한것) </param>
     /// <param name="playerNumber"> 서버에서 넘어오는 플레이어들의 고유 번호 (본인것도 포함) </param>
     /// <param name="playerCards"> 서버에서 넘어오는 플레이어들의 카드 정보 (본인것도 포함) /* 파라미터 입력대로 만들지 않고 전역변수 appPlayer를 이용해서 만들었기 때문에 만약 서버에서 카드를 나눠주는것이 온다면 코드 수정해야함. */ </param>   확인요망!!
-    /// <param name="step"> "first" = 시작하자마자 나눠줌 , "second" = 왼쪽카드 공개 , "last" = 오른쪽 카드 공개. </param>
+    /// <param name="step"> "first" = 시작하자마자 카드 뒷면 스프라이트만 나눠줌 ,"second " = 가운데 카드 스프라이트 변경 ,"third" = 왼쪽카드 스프라이트 공개 , "last" = 오른쪽 카드 스프라이트 공개. </param>
     void DistributeCard(int in_player, int myNumber, int[] playerNumber, int[,] playerCards, string step)
     {
         // 카드가 잘나눠지는지 확인하기 위해 앞면 카드를 배정해줬지만 발표가 끝난 후에는 카드 뒷면을 할당해줄거임.
@@ -320,7 +322,184 @@ public class GameManager_GM : MonoBehaviour
 
 
         }
-        else if (step == "second")               // 왼쪽 카드 공개.
+        else if(step == "second")           // 가운데 카드 공개
+        {
+            Debug.Log("가운데 카드 공개");
+            switch (playerIndex)
+            {
+                case 0:
+                    for (int i = 0; i < in_player; i++)
+                    {
+                        if (i < 3)
+                        {
+                            if (cardValue[arrPlayer[i, 1]] == 0)            // 조커일경우.
+                            {
+                                players[i + 2].handcard[1].GetComponent<SpriteRenderer>().sprite = expressions[2];
+                            }
+                            else if (cardValue[arrPlayer[i, 1]] % 2 == 0)   // 짝수        // arrplayer에 있는것은 스프라이트 인덱스이다. 
+                            {
+                                players[i + 2].handcard[1].GetComponent<SpriteRenderer>().sprite = expressions[0];
+                            }
+                            else if (cardValue[arrPlayer[i, 1]] % 2 != 0)   // 홀수
+                            {
+                                players[i + 2].handcard[1].GetComponent<SpriteRenderer>().sprite = expressions[1];
+
+                            }
+                        }
+                        else
+                        {
+                            if (cardValue[arrPlayer[i, 1]] == 0)            // 조커일경우.
+                            {
+                                players[i - 3].handcard[1].GetComponent<SpriteRenderer>().sprite = expressions[2];
+                            }
+                            else if (cardValue[arrPlayer[i, 1]] % 2 == 0)   // 짝수        // arrplayer에 있는것은 스프라이트 인덱스이다. 
+                            {
+                                players[i - 3].handcard[1].GetComponent<SpriteRenderer>().sprite = expressions[0];
+                            }
+                            else if (cardValue[arrPlayer[i, 1]] % 2 != 0)   // 홀수
+                            {
+                                players[i - 3].handcard[1].GetComponent<SpriteRenderer>().sprite = expressions[1];
+
+                            }
+                        }
+                    }
+                    break;
+                case 1:
+                    for (int i = 0; i < in_player; i++)
+                    {
+                        if (i < 4)
+                        {
+                            if (cardValue[arrPlayer[i, 1]] == 0)            // 조커일경우.
+                            {
+                                players[i + 1].handcard[1].GetComponent<SpriteRenderer>().sprite = expressions[2];
+                            }
+                            else if (cardValue[arrPlayer[i, 1]] % 2 == 0)   // 짝수        // arrplayer에 있는것은 스프라이트 인덱스이다. 
+                            {
+                                players[i + 1].handcard[1].GetComponent<SpriteRenderer>().sprite = expressions[0];
+                            }
+                            else if (cardValue[arrPlayer[i, 1]] % 2 != 0)   // 홀수
+                            {
+                                players[i + 1].handcard[1].GetComponent<SpriteRenderer>().sprite = expressions[1];
+
+                            }
+                        }
+                        else
+                        {
+                            if (cardValue[arrPlayer[i, 1]] == 0)            // 조커일경우.
+                            {
+                                players[i - 4].handcard[1].GetComponent<SpriteRenderer>().sprite = expressions[2];
+                            }
+                            else if (cardValue[arrPlayer[i, 1]] % 2 == 0)   // 짝수        // arrplayer에 있는것은 스프라이트 인덱스이다. 
+                            {
+                                players[i - 4].handcard[1].GetComponent<SpriteRenderer>().sprite = expressions[0];
+                            }
+                            else if (cardValue[arrPlayer[i, 1]] % 2 != 0)   // 홀수
+                            {
+                                players[i - 4].handcard[1].GetComponent<SpriteRenderer>().sprite = expressions[1];
+
+                            }
+                        }
+                    }
+                    break;
+                case 2:
+                    for (int i = 0; i < in_player; i++)
+                    {
+                        if (cardValue[arrPlayer[i, 1]] == 0)            // 조커일경우.
+                        {
+                            players[i].handcard[1].GetComponent<SpriteRenderer>().sprite = expressions[2];
+                        }
+                        else if (cardValue[arrPlayer[i, 1]] % 2 == 0)   // 짝수        // arrplayer에 있는것은 스프라이트 인덱스이다. 
+                        {
+                            players[i].handcard[1].GetComponent<SpriteRenderer>().sprite = expressions[0];
+                        }
+                        else if (cardValue[arrPlayer[i, 1]] % 2 != 0)   // 홀수
+                        {
+                            players[i].handcard[1].GetComponent<SpriteRenderer>().sprite = expressions[1];
+
+                        }
+                    }
+                    break;
+                case 3:
+                    for (int i = 0; i < in_player; i++)
+                    {
+                        if (i > 0)
+                        {
+                            if (cardValue[arrPlayer[i, 1]] == 0)            // 조커일경우.
+                            {
+                                players[i - 1].handcard[1].GetComponent<SpriteRenderer>().sprite = expressions[2];
+                            }
+                            else if (cardValue[arrPlayer[i, 1]] % 2 == 0)   // 짝수        // arrplayer에 있는것은 스프라이트 인덱스이다. 
+                            {
+                                players[i - 1].handcard[1].GetComponent<SpriteRenderer>().sprite = expressions[0];
+                            }
+                            else if (cardValue[arrPlayer[i, 1]] % 2 != 0)   // 홀수
+                            {
+                                players[i - 1].handcard[1].GetComponent<SpriteRenderer>().sprite = expressions[1];
+
+                            }
+                        }
+                        else
+                        {
+                            if (cardValue[arrPlayer[i, 1]] == 0)            // 조커일경우.
+                            {
+                                players[i + 4].handcard[1].GetComponent<SpriteRenderer>().sprite = expressions[2];
+                            }
+                            else if (cardValue[arrPlayer[i, 1]] % 2 == 0)   // 짝수        // arrplayer에 있는것은 스프라이트 인덱스이다. 
+                            {
+                                players[i + 4].handcard[1].GetComponent<SpriteRenderer>().sprite = expressions[0];
+                            }
+                            else if (cardValue[arrPlayer[i, 1]] % 2 != 0)   // 홀수
+                            {
+                                players[i + 4].handcard[1].GetComponent<SpriteRenderer>().sprite = expressions[1];
+
+                            }
+                        }
+                    }
+                    break;
+                case 4:
+                    for (int i = 0; i < in_player; i++)
+                    {
+                        if (i < 2)
+                        {
+                            if (cardValue[arrPlayer[i, 1]] == 0)            // 조커일경우.
+                            {
+                                players[i + 3].handcard[1].GetComponent<SpriteRenderer>().sprite = expressions[2];
+                            }
+                            else if (cardValue[arrPlayer[i, 1]] % 2 == 0)   // 짝수        // arrplayer에 있는것은 스프라이트 인덱스이다. 
+                            {
+                                players[i + 3].handcard[1].GetComponent<SpriteRenderer>().sprite = expressions[0];
+                            }
+                            else if (cardValue[arrPlayer[i, 1]] % 2 != 0)   // 홀수
+                            {
+                                players[i + 3].handcard[1].GetComponent<SpriteRenderer>().sprite = expressions[1];
+
+                            }
+                        }
+                        else
+                        {
+                            if (cardValue[arrPlayer[i, 1]] == 0)            // 조커일경우.
+                            {
+                                players[i - 2].handcard[1].GetComponent<SpriteRenderer>().sprite = expressions[2];
+                            }
+                            else if (cardValue[arrPlayer[i, 1]] % 2 == 0)   // 짝수        // arrplayer에 있는것은 스프라이트 인덱스이다. 
+                            {
+                                players[i - 2].handcard[1].GetComponent<SpriteRenderer>().sprite = expressions[0];
+                            }
+                            else if (cardValue[arrPlayer[i, 1]] % 2 != 0)   // 홀수
+                            {
+                                players[i - 2].handcard[1].GetComponent<SpriteRenderer>().sprite = expressions[1];
+
+                            }
+                        }
+                    }
+                    break;
+
+            }
+
+            isChangeCard = true;
+            isBetting = false;
+        }
+        else if (step == "third")               // 왼쪽 카드 공개.
         {
             Debug.Log("왼쪽 카드 공개");
             switch (playerIndex)
@@ -785,10 +964,12 @@ public class GameManager_GM : MonoBehaviour
             }
         }
         Debug.Log("player01 result : " + resultPlayer[0]);
-        Debug.Log("player01 result : " + resultPlayer[1]);
-        Debug.Log("player01 result : " + resultPlayer[2]);
-        Debug.Log("player01 result : " + resultPlayer[3]);
-        Debug.Log("player01 result : " + resultPlayer[4]);
+        Debug.Log("player02 result : " + resultPlayer[1]);
+        Debug.Log("player03 result : " + resultPlayer[2]);
+        Debug.Log("player04 result : " + resultPlayer[3]);
+        Debug.Log("player05 result : " + resultPlayer[4]);
     }
+
+
 
 }
