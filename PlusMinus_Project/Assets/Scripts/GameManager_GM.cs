@@ -77,17 +77,11 @@ public class GameManager_GM : MonoBehaviour
 
     int[] testplayer = { 0, 1, 2, 3, 4 };
 
-    #region 코드 추가 by 이한수
-    public void SetMyPortIndex(int myPortIndex)
-    {
-        this.myPortIndex = myPortIndex;
-    }
-    #endregion
-
     // Start is called before the first frame update
     void Start()
     {
-        
+        ServerManager.instance.EmitGameReady();
+        myPortIndex = ServerManager.instance.yourTurn;
         isBetting = true;
         betMoney = startmoney;
         Load();           // 현재 참여한 플레이어 배열 여기다가 돈 저장해서 빼고 더하고 할거임.
@@ -104,7 +98,7 @@ public class GameManager_GM : MonoBehaviour
 
         BaseBettingStart();
 
-        Save(2);
+        Save(myPortIndex);
     }
 
     // Update is called once per frame
@@ -138,11 +132,21 @@ public class GameManager_GM : MonoBehaviour
         if (isCheckCard)
         {
             StopCheckCard();
+            int[] tmpArray = new int[3];
+            for(int i=0; i<3; i++)
+            {
+                tmpArray[i] = arrPlayer[myPortIndex, i];
+            }
+            ServerManager.instance.EmitDeicision(myPortIndex, tmpArray);
         }
 
         if (isCheckCard && inGameTime >= set_turnTime)           // 카드 확인도 하고 , 시간초과일때 드래그 스왑 종료.
         {
             OFFCardDrag();
+        }
+
+        if (ServerManager.instance.endData)
+        {
             DistributeCard(curPlayer, myPortIndex, arrPlayer, "second");
         }
 
@@ -152,7 +156,6 @@ public class GameManager_GM : MonoBehaviour
             DistributeCard(curPlayer, myPortIndex, arrPlayer, "third");
             DistributeCard(curPlayer, myPortIndex, arrPlayer, "last");
             ResultNumber(curPlayer, myPortIndex, testplayer, arrPlayer);
-
         }
 
         if (turn)                   // 전체 플레이어 베팅이 시작되면
@@ -733,39 +736,42 @@ public class GameManager_GM : MonoBehaviour
     /// <returns></returns>
     public void RandomCardIndex(int in_player)
     {
-        int rand01, rand02;
-        int[] array_temp = new int[cards.Length];
-        int variable_temp;
+        //int rand01, rand02;
+        //int[] array_temp = new int[cards.Length];
+        //int variable_temp;
 
-        int count = 0;
-        for (int i = 0; i < cards.Length; i++)
-        {
-            array_temp[i] = count;
-            count++;
-        }
+        //int count = 0;
+        //for (int i = 0; i < cards.Length; i++)
+        //{
+        //    array_temp[i] = count;
+        //    count++;
+        //}
 
 
-        for (int i = 0; i < in_player * 3; i++)
-        {
-            rand01 = Random.Range(1, cards.Length);
-            rand02 = Random.Range(1, cards.Length);
+        //for (int i = 0; i < in_player * 3; i++)
+        //{
+        //    rand01 = Random.Range(1, cards.Length);
+        //    rand02 = Random.Range(1, cards.Length);
 
-            variable_temp = array_temp[rand01];
-            array_temp[rand01] = array_temp[rand02];
-            array_temp[rand02] = variable_temp;
+        //    variable_temp = array_temp[rand01];
+        //    array_temp[rand01] = array_temp[rand02];
+        //    array_temp[rand02] = variable_temp;
 
-        }
+        //}
 
-        count = 1;
-        for (int i = 0; i < in_player; i++)
-        {
+        //count = 1;
+        //for (int i = 0; i < in_player; i++)
+        //{
 
-            for (int j = 0; j < 3; j++)
-            {
-                arrPlayer[i, j] = array_temp[count];
-                count++;
-            }
-        }
+        //    for (int j = 0; j < 3; j++)
+        //    {
+        //        arrPlayer[i, j] = array_temp[count];
+        //        count++;
+        //    }
+        //}
+
+        arrPlayer = ServerManager.instance.arrPlayer;
+
         //서버로 코드 옮김
         Debug.Log("card 01 : " + arrPlayer[0, 0] + ", " + arrPlayer[0, 1] + ", " + arrPlayer[0, 2]);
         Debug.Log("card 02 : " + arrPlayer[1, 0] + ", " + arrPlayer[1, 1] + ", " + arrPlayer[1, 2]);

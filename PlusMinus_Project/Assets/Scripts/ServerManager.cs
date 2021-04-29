@@ -5,10 +5,18 @@ using UnityEngine.SceneManagement;
 using UnityEngine.Networking;
 using socket.io;
 using Newtonsoft.Json;
+
 [System.Serializable]
 public class RequestForm
 {
     public string nickname;
+}
+
+[System.Serializable]
+public class DecisionRequestForm
+{
+    public int index;
+    public int[] decision = new int[3];
 }
 
 [System.Serializable]
@@ -39,6 +47,11 @@ public class ServerManager : MonoBehaviour
 {
     public static ServerManager instance;
     Socket socket;
+
+    public int yourTurn;
+    public int[,] arrPlayer = new int[5,3];
+    public bool firstData = true;
+    public bool endData = false;
 
     private void Awake()
     {
@@ -96,12 +109,12 @@ public class ServerManager : MonoBehaviour
 
     void OnPick(string json)
     {
-        SceneManager.LoadScene("InGame");
         PickResponseForm form = JsonUtility.FromJson<PickResponseForm>(json);
 
         print("내 차례는" + form.yourTurn + "입니다");
 
-        GameObject.Find("GameManagaer").GetComponent<GameManager_GM>().SetMyPortIndex(form.yourTurn);
+        yourTurn = form.yourTurn;
+        SceneManager.LoadScene("InGame");
     }
 
     public void EmitGameReady()
@@ -109,14 +122,31 @@ public class ServerManager : MonoBehaviour
         socket.Emit("gameReady");
     }
 
+    public void EmitDeicision(int index, int []decision)
+    {
+        if (firstData)
+        {
+            firstData = false;
+        }
+        else
+        {
+            endData = true;
+        }
+        DecisionRequestForm form = new DecisionRequestForm();
+        form.index = index;
+        form.decision = decision;
+
+        socket.EmitJson("decision", JsonUtility.ToJson(form));
+    }
+
     void OnGameReady(string json)
     {
-        for(int i=0;i<5; i++)
+        CardResponseForm form = JsonConvert.DeserializeObject<CardResponseForm>(json);
+        for (int i=0;i<5; i++)
         {
             for(int j=0; j<3; j++)
             {
-                CardResponseForm form = JsonConvert.DeserializeObject<CardResponseForm>(json);
-                GameObject.Find("GameManagaer").GetComponent<GameManager_GM>().arrPlayer[i, j] = form.arrPlayer[i][j];
+                arrPlayer[i, j] = form.arrPlayer[i][j];
             }
         }
     }
