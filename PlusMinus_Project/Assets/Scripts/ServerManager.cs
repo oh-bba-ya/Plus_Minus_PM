@@ -6,6 +6,8 @@ using UnityEngine.Networking;
 using socket.io;
 using Newtonsoft.Json;
 
+#region Server Connection Forms
+
 [System.Serializable]
 public class RequestForm
 {
@@ -17,6 +19,14 @@ public class DecisionRequestForm
 {
     public int index;
     public int[] decision = new int[3];
+}
+
+[System.Serializable]
+public class BettingRequestForm
+{
+    public int index;
+    public int betMoney;
+    public int totalMoney;
 }
 
 [System.Serializable]
@@ -42,6 +52,8 @@ public class GameEndResponseForm
 {
     public int addMoney;
 }
+
+#endregion
 
 public class ServerManager : MonoBehaviour
 {
@@ -76,7 +88,7 @@ public class ServerManager : MonoBehaviour
         socket.On("join", OnJoin);
         socket.On("pick", OnPick);
         socket.On("gameReady", OnGameReady);
-        socket.On("batting", OnBatting);
+        socket.On("betting", OnBetting);
         socket.On("paseEnd", OnPaseEnd);
         socket.On("gameEnd", OnGameEnd);
         socket.On("destory", OnDestroyRoom);
@@ -151,13 +163,17 @@ public class ServerManager : MonoBehaviour
         }
     }
 
-    public void EmitBatting(int turnIndex, int battingMoney)
+    public void EmitBetting(int index, int betMoney, int totalMoney)
     {
-        string json = "";
-        socket.EmitJson("batting", json);
+        BettingRequestForm form = new BettingRequestForm();
+        form.index = index;
+        form.betMoney = betMoney;
+        form.totalMoney = totalMoney;
+
+        socket.EmitJson("batting", JsonUtility.ToJson(form));
     }
 
-    void OnBatting(string json)
+    void OnBetting(string json)
     {
 
     }

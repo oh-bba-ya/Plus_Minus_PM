@@ -137,6 +137,7 @@ public class GameManager_GM : MonoBehaviour
                 }
                 else if (ServerManager.instance.endData)    // 모든 유저들이 카드를 바꾼 정보가 서버에서 취합완료됬으므로 가운데 카드 공개되자마자 + / - / * 중 하나로 바뀜.
                 {
+                    arrPlayer = ServerManager.instance.arrPlayer;
                     DistributeCard(curPlayer, myPortIndex, arrPlayer, "second");            // 가운데 카드를 공개했으므로 첫번째 베팅 시작.
                     
 
@@ -933,6 +934,7 @@ public class GameManager_GM : MonoBehaviour
             playerMoney -= betMoney;
             players[myPortIndex].money = playerMoney;
             my_PreBetMoney = betMoney;
+            ServerManager.instance.EmitBetting(myPortIndex, betMoney, totalMoney);
         }
         else if(betMoney - my_PreBetMoney != 0)
         { 
@@ -941,6 +943,7 @@ public class GameManager_GM : MonoBehaviour
             playerMoney -= restBetMoney;
             players[myPortIndex].money = playerMoney;
             my_PreBetMoney = betMoney;
+            ServerManager.instance.EmitBetting(myPortIndex, restBetMoney, totalMoney);
         }
       
     }
@@ -957,7 +960,7 @@ public class GameManager_GM : MonoBehaviour
         totalMoney += betMoney;
         playerMoney = playerMoney - betMoney;
         players[myPortIndex].money = playerMoney;
-        
+        ServerManager.instance.EmitBetting(myPortIndex, betMoney, totalMoney);
     }
 
     /// <summary>
@@ -972,6 +975,7 @@ public class GameManager_GM : MonoBehaviour
         my_PreBetMoney = betMoney;
         totalMoney += betMoney;
         players[myPortIndex].money = playerMoney;
+        ServerManager.instance.EmitBetting(myPortIndex, betMoney, totalMoney);
     }
 
     /// <summary>
@@ -998,6 +1002,8 @@ public class GameManager_GM : MonoBehaviour
         
         playerMoney -= startmoney * curPlayer;
         players[myPortIndex].money = playerMoney;
+
+        ServerManager.instance.EmitBetting(myPortIndex, -1, totalMoney);
     }
 
     /// <summary>
