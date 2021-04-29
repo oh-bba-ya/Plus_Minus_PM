@@ -29,10 +29,10 @@ def login():
     password = request.form.get('password')
 
     pmuser = PMUser.query.filter_by(userid=userid).first()
-    if pmuser.password != password :
-        return {"result" : "Success", "nickname" : "none", "money" : 0}
+    if pmuser != None and pmuser.password == password :
+        return {"result" : "Success", "nickname" : pmuser.username, "money" : int(pmuser.money)}
     else :
-        return {"result" : "Success", "nickname" : pmuser.username, "money" : pmuser.money}
+        return {"result" : "Fail", "nickname" : "none", "money" : 0}
 
 @app.route('/refresh', methods=['GET','POST'])
 def refresh():
@@ -40,7 +40,7 @@ def refresh():
     money = request.form.get('money')
 
     pmuser = PMUser.query.filter_by(userid=userid).first()
-    pmuser.money = money
+    pmuser.money = int(money)
 
     db.session.commit()
     return "Success"
