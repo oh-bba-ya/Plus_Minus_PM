@@ -100,7 +100,8 @@ public class GameManager_GM : MonoBehaviour
         //int[] testplayer = { 0, 1, 2, 3, 4 };
         //int[,] testcards = { { 0, 1, 2 }, { 3, 4, 5 } };
 
-        DistributeCard(curPlayer, myPortIndex, testplayer, arrPlayer, "first");
+        
+        DistributeCard(curPlayer, myPortIndex, arrPlayer, "first");
 
         BaseBettingStart();
 
@@ -143,14 +144,14 @@ public class GameManager_GM : MonoBehaviour
         if (isCheckCard && inGameTime >= set_turnTime)           // 카드 확인도 하고 , 시간초과일때 드래그 스왑 종료.
         {
             OFFCardDrag();
-            DistributeCard(curPlayer, myPortIndex, testplayer, arrPlayer, "second");
+            DistributeCard(curPlayer, myPortIndex, arrPlayer, "second");
         }
 
         if (isDragDrop && isChangeCard)
         {
             BackPosition();
-            DistributeCard(curPlayer, myPortIndex, testplayer, arrPlayer, "third");
-            DistributeCard(curPlayer, myPortIndex, testplayer, arrPlayer, "last");
+            DistributeCard(curPlayer, myPortIndex, arrPlayer, "third");
+            DistributeCard(curPlayer, myPortIndex, arrPlayer, "last");
             ResultNumber(curPlayer, myPortIndex, testplayer, arrPlayer);
 
         }
@@ -291,24 +292,24 @@ public class GameManager_GM : MonoBehaviour
     /// <param name="playerNumber"> 서버에서 넘어오는 플레이어들의 고유 번호 (본인것도 포함) </param>
     /// <param name="playerCards"> 서버에서 넘어오는 플레이어들의 카드 정보 (본인것도 포함) /* 파라미터 입력대로 만들지 않고 전역변수 appPlayer를 이용해서 만들었기 때문에 만약 서버에서 카드를 나눠주는것이 온다면 코드 수정해야함. */ </param>   확인요망!!
     /// <param name="step"> "first" = 시작하자마자 카드 뒷면 스프라이트만 나눠줌 ,"second " = 가운데 카드 스프라이트 변경 ,"third" = 왼쪽카드 스프라이트 공개 , "last" = 오른쪽 카드 스프라이트 공개. </param>
-    void DistributeCard(int in_player, int myNumber, int[] playerNumber, int[,] playerCards, string step)
+    void DistributeCard(int in_player, int myPlayerIndex, int[,] playerCards, string step)
     {
         // 카드가 잘나눠지는지 확인하기 위해 앞면 카드를 배정해줬지만 발표가 끝난 후에는 카드 뒷면을 할당해줄거임.
         // 스프라이트 앞면에 해당하는 인덱스를 각 플레이어에게 할당해줄거임.
         // 뒷면 카드 확인 하기위해 mynumber = 4일때 가렸음.
 
-        Debug.Log("Distri : " + in_player);
+        //Debug.Log("Distri : " + in_player);
 
-        int playerIndex = 2;                // 본인의 고유정보와 , 서버에서 전달된 본인의 정보 인덱스
+        //int playerIndex = 2;                // 본인의 고유정보와 , 서버에서 전달된 본인의 정보 인덱스
 
-        for (int i = 0; i < in_player; i++)
-        {
-            if (myNumber == playerNumber[i])
-            {
-                playerIndex = i;
-                myPortIndex = i;
-            }
-        }
+        //for (int i = 0; i < in_player; i++)
+        //{
+        //    if (myNumber == playerNumber[i])
+        //    {
+        //        playerIndex = i;
+        //        myPortIndex = i;
+        //    }
+        //}
 
         if (step == "first")             // start 에서 시작됨. 처음 카드를 나눠줌.
         {
@@ -325,7 +326,7 @@ public class GameManager_GM : MonoBehaviour
         else if(step == "second")           // 가운데 카드 공개
         {
             Debug.Log("가운데 카드 공개");
-            switch (playerIndex)
+            switch (myPlayerIndex)
             {
                 case 0:
                     for (int i = 0; i < in_player; i++)
@@ -502,7 +503,7 @@ public class GameManager_GM : MonoBehaviour
         else if (step == "third")               // 왼쪽 카드 공개.
         {
             Debug.Log("왼쪽 카드 공개");
-            switch (playerIndex)
+            switch (myPlayerIndex)
             {
                 case 0:             // player 01. 플레이어 본인 카드 외에는 
                     for (int i = 0; i < in_player; i++)
@@ -576,7 +577,7 @@ public class GameManager_GM : MonoBehaviour
         else if (step == "last")
         {
             Debug.Log("오른쪽 카드 공개");
-            switch (playerIndex)
+            switch (myPlayerIndex)
             {
                 case 0:             // player 01. 플레이어 본인 카드 외에는 
                     for (int i = 0; i < in_player; i++)
