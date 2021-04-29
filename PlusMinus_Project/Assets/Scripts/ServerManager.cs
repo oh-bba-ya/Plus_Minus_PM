@@ -23,6 +23,18 @@ public class CardResponseForm
     public List<List<int>> arrPlayer = new List<List<int>>();
 }
 
+[System.Serializable]
+public class BattingResponseForm
+{
+    public int addMoney;
+}
+
+[System.Serializable]
+public class GameEndResponseForm
+{
+    public int addMoney;
+}
+
 public class ServerManager : MonoBehaviour
 {
     public static ServerManager instance;
@@ -52,6 +64,7 @@ public class ServerManager : MonoBehaviour
         socket.On("pick", OnPick);
         socket.On("gameReady", OnGameReady);
         socket.On("batting", OnBatting);
+        socket.On("paseEnd", OnPaseEnd);
         socket.On("gameEnd", OnGameEnd);
         socket.On("destory", OnDestroyRoom);
     }
@@ -118,9 +131,18 @@ public class ServerManager : MonoBehaviour
     {
 
     }
+    
+    void OnPaseEnd(string json)
+    {
+
+    }
 
     void OnGameEnd(string json)
     {
+        GameEndResponseForm form = JsonUtility.FromJson<GameEndResponseForm>(json);
+        int currentMoney = PlayerPrefs.GetInt("Money");
+        currentMoney += form.addMoney;
+        PlayerPrefs.SetInt("Money",currentMoney);
         RefreshMoney();
     }
 
@@ -139,6 +161,7 @@ public class ServerManager : MonoBehaviour
     {
         List<IMultipartFormSection> form = new List<IMultipartFormSection>();
         form.Add(new MultipartFormDataSection("userid", PlayerPrefs.GetString("Id")));
+        form.Add(new MultipartFormDataSection("money", PlayerPrefs.GetInt("Money").ToString()));
         UnityWebRequest webRequest = UnityWebRequest.Post("http://pm.dalae37.com:5000/refresh", form);
         yield return webRequest.SendWebRequest();
 
