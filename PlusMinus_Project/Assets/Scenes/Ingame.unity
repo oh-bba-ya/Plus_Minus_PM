@@ -238,7 +238,6 @@ MonoBehaviour:
   - {fileID: 1446536605}
   - {fileID: 641188655}
   - {fileID: 685049697}
-  myPortIndex: 4
   myPortIndex: 0
   isCheckCard: 0
   isDragDrop: 0

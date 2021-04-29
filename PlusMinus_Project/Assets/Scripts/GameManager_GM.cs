@@ -99,7 +99,6 @@ public class GameManager_GM : MonoBehaviour
 
         //int[] testplayer = { 0, 1, 2, 3, 4 };
         //int[,] testcards = { { 0, 1, 2 }, { 3, 4, 5 } };
-
         
         DistributeCard(curPlayer, myPortIndex, arrPlayer, "first");
 
