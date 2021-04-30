@@ -265,7 +265,6 @@ MonoBehaviour:
   totalMoney: 0
   startmoney: 20
   betMoney: 0
-  slider: {fileID: 1210450846}
 --- !u!1 &86506205
 GameObject:
   m_ObjectHideFlags: 0

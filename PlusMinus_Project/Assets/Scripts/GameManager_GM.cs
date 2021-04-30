@@ -166,6 +166,10 @@ public class GameManager_GM : MonoBehaviour
                             {
                                 OnBetting();        // 버튼 함수 활성화.
                             }
+                            else
+                            {
+                                OffBetting();
+                            }
                         }
                         else if (isFirstBetEnd)     // 첫번째 베팅 종료 후. 왼쪽 카드 공개 후 마지막 베팅 시작.
                         {
@@ -176,6 +180,10 @@ public class GameManager_GM : MonoBehaviour
                                 if (ismyTurn)           // 베팅중 나의 턴일때만 버튼 함수 실행시킴.
                                 {
                                     OnBetting();        // 버튼 함수 활성화.
+                                }
+                                else
+                                {
+                                    OffBetting();
                                 }
                             }
                             else if (isLastBetEnd)      // 마지막 베팅 종료시 오른쪽 카드 공개. 플레이어 카드 합산 결과 함수 실행.
