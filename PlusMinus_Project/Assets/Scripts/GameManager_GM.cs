@@ -15,7 +15,7 @@ public class GameManager_GM : MonoBehaviour
     /// cardValue의 경우 cards가 스프라이트 배열이므로 각 인덱스에 해당하는 카드 숫자(ex : cards[5] = 하트 7 일 경우  cardValue[5] = 7)를 저장하는 배열.
     /// 조커 = 0 ,
     /// </summary>
-    public int[] cardValue = { -1, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ,11, 12, 13, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13 , 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13 , 0 , 0}; 
+    public int[] cardValue = { -1, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 0, 0 };
 
     public int[] expressionValue = { -2, -3, -4 };          // -2 = plus , -3 = minus , -4 = mult .
     public int curPlayer = 0;               // 현재 방에 참여한 인원.
@@ -72,7 +72,7 @@ public class GameManager_GM : MonoBehaviour
     //************* 베팅 관련 변수. *****************//
     public int playerBetTime = 10;              // 플레이어 베팅 시간.
     int btnIndex;                               // 
-    bool ismyTurn ;                        // 나의 베팅 턴 , true가 될때마다 내 차례임.
+    bool ismyTurn;                        // 나의 베팅 턴 , true가 될때마다 내 차례임.
     public int totalMoney = 0;
     public int startmoney = 20;         // 처음 시작시 판돈 금액
     public int betMoney = 0;
@@ -100,7 +100,7 @@ public class GameManager_GM : MonoBehaviour
 
         //int[] testplayer = { 0, 1, 2, 3, 4 };
         //int[,] testcards = { { 0, 1, 2 }, { 3, 4, 5 } };
-        
+
         DistributeCard(curPlayer, myPortIndex, arrPlayer, "first");
 
         BaseBettingStart();
@@ -139,7 +139,7 @@ public class GameManager_GM : MonoBehaviour
                 {
                     arrPlayer = ServerManager.instance.arrPlayer;
                     DistributeCard(curPlayer, myPortIndex, arrPlayer, "second");            // 가운데 카드를 공개했으므로 첫번째 베팅 시작.
-                    
+
 
                     if (isChangeCard && !isLeftCard && !isFirstBet && !isFirstBetEnd)                // 가운데 카드가 공개된후. 첫 베팅 시작전.
                     {
@@ -177,7 +177,7 @@ public class GameManager_GM : MonoBehaviour
 
         }
 
-        
+
 
 
 
@@ -303,12 +303,12 @@ public class GameManager_GM : MonoBehaviour
             stepText.text = "카드를 배치 \n 해주세요";
         }
 
-        if (ismyTurn && !isFirstBet )
-        { 
+        if (ismyTurn && !isFirstBet)
+        {
             stepText.text = playerBetTime.ToString();
         }
 
-        if(ismyTurn && !isLastBet)
+        if (ismyTurn && !isLastBet)
         {
             stepText.text = playerBetTime.ToString();
         }
@@ -334,7 +334,7 @@ public class GameManager_GM : MonoBehaviour
         isFirstBet = true;
     }
 
-    
+
     /// <summary>
     /// 첫번째 베팅 종료.
     /// </summary>
@@ -396,7 +396,7 @@ public class GameManager_GM : MonoBehaviour
     /// <param name="myindex"></param>
     void Save(int myindex)
     {
-        
+
         PlayerPrefs.SetInt("Money", players[myindex].money);
     }
 
@@ -463,7 +463,7 @@ public class GameManager_GM : MonoBehaviour
 
 
         }
-        else if(step == "second")           // 가운데 카드 공개
+        else if (step == "second")           // 가운데 카드 공개
         {
             Debug.Log("가운데 카드 공개");
             switch (myPlayerIndex)
@@ -936,8 +936,8 @@ public class GameManager_GM : MonoBehaviour
             my_PreBetMoney = betMoney;
             ServerManager.instance.EmitBetting(myPortIndex, betMoney, totalMoney);
         }
-        else if(betMoney - my_PreBetMoney != 0)
-        { 
+        else if (betMoney - my_PreBetMoney != 0)
+        {
             int restBetMoney = betMoney - my_PreBetMoney;
             totalMoney += restBetMoney;
             playerMoney -= restBetMoney;
@@ -945,7 +945,7 @@ public class GameManager_GM : MonoBehaviour
             my_PreBetMoney = betMoney;
             ServerManager.instance.EmitBetting(myPortIndex, restBetMoney, totalMoney);
         }
-      
+
     }
 
     /// <summary>
@@ -955,7 +955,7 @@ public class GameManager_GM : MonoBehaviour
     {
         btnIndex = 1;
         Debug.Log("Double");
-        my_PreBetMoney = betMoney*2;
+        my_PreBetMoney = betMoney * 2;
         betMoney = betMoney * 2;
         totalMoney += betMoney;
         playerMoney = playerMoney - betMoney;
@@ -969,7 +969,7 @@ public class GameManager_GM : MonoBehaviour
     public void OnClickHalfBtn()
     {
         btnIndex = 2;
-        Debug.Log("Half"); 
+        Debug.Log("Half");
         betMoney = betMoney + (totalMoney / 2);
         playerMoney = playerMoney - betMoney;
         my_PreBetMoney = betMoney;
@@ -995,11 +995,11 @@ public class GameManager_GM : MonoBehaviour
             totalMoney = totalMoney + (startmoney * curPlayer);
         }
 
-        for(int i = 0; i < 3; i++)                  // Die 버튼을 누른다면 가지고 있는 3장의 카드 정보가 0으로 바뀜. 이럴경우 카드 뒷면 인덱스를 가지게됨.
+        for (int i = 0; i < 3; i++)                  // Die 버튼을 누른다면 가지고 있는 3장의 카드 정보가 0으로 바뀜. 이럴경우 카드 뒷면 인덱스를 가지게됨.
         {
             arrPlayer[myPortIndex, i] = 0;
         }
-        
+
         playerMoney -= startmoney * curPlayer;
         players[myPortIndex].money = playerMoney;
 
@@ -1013,7 +1013,7 @@ public class GameManager_GM : MonoBehaviour
     /// <param name="in_player"> 현재 게임에 참여한 인원 </param>
     void ResultNumber(int in_player)
     {
-        
+
         int[] resultPlayer = new int[in_player];         // 플레이어들의 합산 결과.
 
 

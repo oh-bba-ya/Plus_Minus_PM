@@ -61,7 +61,7 @@ public class ServerManager : MonoBehaviour
     Socket socket;
 
     public int yourTurn;
-    public int[,] arrPlayer = new int[5,3];
+    public int[,] arrPlayer = new int[5, 3];
     public bool firstData = true;
     public bool endData = false;
 
@@ -134,7 +134,7 @@ public class ServerManager : MonoBehaviour
         socket.Emit("gameReady");
     }
 
-    public void EmitDeicision(int index, int []decision)
+    public void EmitDeicision(int index, int[] decision)
     {
         if (firstData)
         {
@@ -154,9 +154,9 @@ public class ServerManager : MonoBehaviour
     void OnGameReady(string json)
     {
         CardResponseForm form = JsonConvert.DeserializeObject<CardResponseForm>(json);
-        for (int i=0;i<5; i++)
+        for (int i = 0; i < 5; i++)
         {
-            for(int j=0; j<3; j++)
+            for (int j = 0; j < 3; j++)
             {
                 arrPlayer[i, j] = form.arrPlayer[i][j];
             }
@@ -177,7 +177,7 @@ public class ServerManager : MonoBehaviour
     {
 
     }
-    
+
     void OnPaseEnd(string json)
     {
 
@@ -188,7 +188,7 @@ public class ServerManager : MonoBehaviour
         GameEndResponseForm form = JsonUtility.FromJson<GameEndResponseForm>(json);
         int currentMoney = PlayerPrefs.GetInt("Money");
         currentMoney += form.addMoney;
-        PlayerPrefs.SetInt("Money",currentMoney);
+        PlayerPrefs.SetInt("Money", currentMoney);
         RefreshMoney();
     }
 
@@ -212,7 +212,8 @@ public class ServerManager : MonoBehaviour
         yield return webRequest.SendWebRequest();
 
         string result = webRequest.downloadHandler.text;
-        if (result.Equals("Success")){
+        if (result.Equals("Success"))
+        {
             print("돈 업데이트 성공");
         }
     }
