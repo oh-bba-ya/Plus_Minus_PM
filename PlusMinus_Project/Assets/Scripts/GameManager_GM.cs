@@ -81,6 +81,8 @@ public class GameManager_GM : MonoBehaviour
 
     int[] testplayer = { 0, 1, 2, 3, 4 };
 
+    public Slider slider;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -121,10 +123,13 @@ public class GameManager_GM : MonoBehaviour
                 OffBetting();
                 if (!isCheckCard)
                 {
+                    Debug.Log(inGameTime);
+                    slider.value -= inGameTime*0.001f;
                     StartCoroutine(ClickCard(myPortIndex));
                 }
                 else
                 {
+                    slider.value = 1f;
                     StopCheckCard();
                 }
             }
