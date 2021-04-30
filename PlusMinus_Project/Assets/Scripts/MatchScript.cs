@@ -6,7 +6,7 @@ using UnityEngine.UI;
 public class MatchScript : MonoBehaviour
 {
     public Button matchBtn;
-    public Canvas canvas;
+    public GameObject panel;
     // Start is called before the first frame update
     void Start()
     {
@@ -21,6 +21,7 @@ public class MatchScript : MonoBehaviour
 
     public void clickMatch()
     {
-        Debug.Log("¿Œ ∞‘¿”");
+        panel.SetActive(true);
+        matchBtn.gameObject.SetActive(false);
     }
 }
