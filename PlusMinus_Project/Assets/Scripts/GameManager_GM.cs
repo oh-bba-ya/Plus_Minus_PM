@@ -310,24 +310,24 @@ public class GameManager_GM : MonoBehaviour
 
     void DisplayStepByStep()
     {
-        if (inGameTime < set_turnTime && !isCheckCard)
+        if ((inGameTime < set_turnTime) && (!isCheckCard))
         {
-            stepText.text = "카드를 확인 \n 해주세요";
+            //stepText.text = "카드를 확인 \n 해주세요";
         }
 
         if (isCheckCard)
         {
-            stepText.text = "카드를 배치 \n 해주세요";
+            //stepText.text = "카드를 배치 \n 해주세요";
         }
 
         if (ismyTurn && !isFirstBet)
         {
-            stepText.text = playerBetTime.ToString();
+            //stepText.text = playerBetTime.ToString();
         }
 
         if (ismyTurn && !isLastBet)
         {
-            stepText.text = playerBetTime.ToString();
+           // stepText.text = playerBetTime.ToString();
         }
 
         // 현재 전체 표시

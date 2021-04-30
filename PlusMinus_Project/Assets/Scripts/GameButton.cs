@@ -9,10 +9,12 @@ public class GameButton : MonoBehaviour
     public Button ruleBtn;
     public GameObject rule;
     public Button Close;
+
     bool isClickRule = false;
     // Start is called before the first frame update
     void Start()
     {
+        
         Close.interactable = false;
         rule.SetActive(false);
         //ruleBtn.interactable = false;
@@ -26,15 +28,22 @@ public class GameButton : MonoBehaviour
 
     public void onClickRule()
     {
-        isClickRule = true;
-        rule.SetActive(true);
-
-        Close.interactable = true;
+        if (isClickRule == true)
+        {
+            isClickRule = false;
+            rule.SetActive(false);
+        }
+        else
+        {
+            isClickRule = true;
+            rule.SetActive(true);
+        }
     }
     public void onClickClose()
     {
         isClickRule = false;
         rule.SetActive(false);
+        Close.interactable = false;
     }
 
     public void GameQuit()

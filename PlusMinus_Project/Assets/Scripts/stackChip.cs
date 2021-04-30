@@ -17,6 +17,7 @@ public class stackChip : MonoBehaviour
     public GameObject winner;
     public GameObject loser;
     public GameObject draw;
+    public GameObject FinalBtn;
 
     public bool isWinner = false;
     public bool isLoser = false;
@@ -28,6 +29,7 @@ public class stackChip : MonoBehaviour
         winner.SetActive(false);
         loser.SetActive(false);
         draw.SetActive(false);
+        FinalBtn.SetActive(false);
         gameRestart.enabled = false;
         gameQuit.enabled = false;
     }
@@ -71,6 +73,7 @@ public class stackChip : MonoBehaviour
         }
         else if (isWinner || isLoser || isDraw)
         {
+            FinalBtn.SetActive(true);
             gameQuit.enabled = true;
             gameRestart.enabled = true;
             if (isWinner)
