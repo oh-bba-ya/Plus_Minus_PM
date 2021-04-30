@@ -22,6 +22,12 @@ public class DecisionRequestForm
 }
 
 [System.Serializable]
+public class ResultRequestForm
+{
+    public int[] playerResult = new int[5];
+}
+
+[System.Serializable]
 public class BettingRequestForm
 {
     public int index;
@@ -46,6 +52,13 @@ public class BattingResponseForm
 {
     public int addMoney;
 }
+
+[System.Serializable]
+public class DieResponseForm
+{
+    public int index;
+}
+
 
 [System.Serializable]
 public class GameEndResponseForm
@@ -90,6 +103,7 @@ public class ServerManager : MonoBehaviour
         socket.On("gameReady", OnGameReady);
         socket.On("betting", OnBetting);
         socket.On("die", OnDie);
+        socket.On("yourTurn", OnYourTurn);
         socket.On("paseEnd", OnPaseEnd);
         socket.On("gameEnd", OnGameEnd);
         socket.On("destory", OnDestroyRoom);
@@ -139,14 +153,6 @@ public class ServerManager : MonoBehaviour
 
     public void EmitDeicision(int index, int[] decision)
     {
-        if (firstData)
-        {
-            firstData = false;
-        }
-        else
-        {
-            endData = true;
-        }
         DecisionRequestForm form = new DecisionRequestForm();
         form.index = index;
         form.decision = decision;
@@ -156,6 +162,16 @@ public class ServerManager : MonoBehaviour
 
     void OnGameReady(string json)
     {
+        if (firstData)
+        {
+            print("첫 번째 데이터");
+            firstData = false;
+        }
+        else
+        {
+            print("두 번째 데이터");
+            endData = true;
+        }
         CardResponseForm form = JsonConvert.DeserializeObject<CardResponseForm>(json);
         for (int i = 0; i < 5; i++)
         {
@@ -164,6 +180,7 @@ public class ServerManager : MonoBehaviour
                 arrPlayer[i, j] = form.arrPlayer[i][j];
             }
         }
+        print("카드 정보 도착");
     }
 
     public void EmitBetting(int index, int betMoney, int totalMoney)
@@ -176,6 +193,30 @@ public class ServerManager : MonoBehaviour
         socket.EmitJson("batting", JsonUtility.ToJson(form));
     }
 
+    public void EmitGameResult(int[] result)
+    {
+        ResultRequestForm form = new ResultRequestForm();
+        for (int i = 0; i < 5; i++)
+        {
+            form.playerResult[i] = result[i];
+        }
+        socket.EmitJson("gameResult", JsonUtility.ToJson(form));
+    }
+
+    public void EmitResult(int index)
+    {
+        DieResponseForm form = new DieResponseForm();
+        form.index = index;
+
+        socket.EmitJson("result", JsonUtility.ToJson(form));
+    }
+
+    void OnYourTurn(string json)
+    {
+        print("나의 차례");
+        GameObject.Find("GameManager").GetComponent<GameManager_GM>().setMyTurn(true);
+    }
+
     void OnBetting(string json)
     {
 
@@ -183,7 +224,10 @@ public class ServerManager : MonoBehaviour
 
     void OnDie(string json)
     {
-
+        DieResponseForm form = JsonUtility.FromJson<DieResponseForm>(json);
+        GameObject.Find("GameManager").GetComponent<GameManager_GM>().arrPlayer[form.index, 0] = 0;
+        GameObject.Find("GameManager").GetComponent<GameManager_GM>().arrPlayer[form.index, 1] = 0;
+        GameObject.Find("GameManager").GetComponent<GameManager_GM>().arrPlayer[form.index, 2] = 0;
     }
 
     void OnPaseEnd()
@@ -194,7 +238,7 @@ public class ServerManager : MonoBehaviour
         }
         else if (!GameObject.Find("GameManager").GetComponent<GameManager_GM>().isLastBetEnd)
         {
-            GameObject.Find("GameManager").GetComponent<GameManager_GM>().isFirstBetEnd = true;
+            GameObject.Find("GameManager").GetComponent<GameManager_GM>().isLastBetEnd = true;
         }
     }
 

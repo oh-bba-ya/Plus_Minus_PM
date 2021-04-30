@@ -81,9 +81,6 @@ public class GameManager_GM : MonoBehaviour
 
     int[] testplayer = { 0, 1, 2, 3, 4 };
 
-    public Slider slider;
-
-
     // Start is called before the first frame update
     void Start()
     {
@@ -101,7 +98,6 @@ public class GameManager_GM : MonoBehaviour
             startPos[i] = originPos[i].transform.position;
         }
 
-        //칩 쌓기 테스트
         //int[] testplayer = { 0, 1, 2, 3, 4 };
         //int[,] testcards = { { 0, 1, 2 }, { 3, 4, 5 } };
 
@@ -111,6 +107,9 @@ public class GameManager_GM : MonoBehaviour
 
         Save(myPortIndex);
     }
+
+    bool onceUpdated = false;
+    bool twiceUpdate = false;
 
     // Update is called once per frame
     void Update()
@@ -125,55 +124,64 @@ public class GameManager_GM : MonoBehaviour
                 OffBetting();
                 if (!isCheckCard)
                 {
-                    //Debug.Log(inGameTime);
-                    slider.value -= inGameTime*0.001f;
                     StartCoroutine(ClickCard(myPortIndex));
                 }
                 else
                 {
-                    slider.value = 1f;
                     StopCheckCard();
                 }
             }
             else if (inGameTime > set_turnTime)      // 설정된 시간 이후 3장의 카드 Drag&Drop 불가능
             {
                 OFFCardDrag();
-                if (!isCheckCard)        // 설정된 시간 이후에도 카드 확인이 완료되지 않았다면 가운데 카드 자동 확인.
+                if (!onceUpdated)
                 {
-                    AutoCheck(myPortIndex);
+                    int[] list = { arrPlayer[myPortIndex, 0], arrPlayer[myPortIndex, 1], arrPlayer[myPortIndex, 2] };
+                    ServerManager.instance.EmitDeicision(myPortIndex, list);
+                    onceUpdated = true;
                 }
-                else if (ServerManager.instance.endData)    // 모든 유저들이 카드를 바꾼 정보가 서버에서 취합완료됬으므로 가운데 카드 공개되자마자 + / - / * 중 하나로 바뀜.
+                else
                 {
-                    arrPlayer = ServerManager.instance.arrPlayer;
-                    DistributeCard(curPlayer, myPortIndex, arrPlayer, "second");            // 가운데 카드를 공개했으므로 첫번째 베팅 시작.
-
-
-                    if (isChangeCard && !isLeftCard && !isFirstBet && !isFirstBetEnd)                // 가운데 카드가 공개된후. 첫 베팅 시작전.
+                    if (!isCheckCard)        // 설정된 시간 이후에도 카드 확인이 완료되지 않았다면 가운데 카드 자동 확인.
                     {
-                        OnFirstBet();       // 첫번째 베팅 시작. [ isFirstBet = false 로 변경됨]
+                        AutoCheck(myPortIndex);
                     }
-                    else if (isFirstBet && !isFirstBetEnd)    // 첫번째 베팅이 시작했다면.
+                    else if (ServerManager.instance.endData)    // 모든 유저들이 카드를 바꾼 정보가 서버에서 취합완료됬으므로 가운데 카드 공개되자마자 + / - / * 중 하나로 바뀜.
                     {
-                        if (ismyTurn)           // 베팅중 나의 턴일때만 버튼 함수 실행시킴.
+                        arrPlayer = ServerManager.instance.arrPlayer;
+                        if (!twiceUpdate)
                         {
-                            OnBetting();        // 버튼 함수 활성화.
+                            ResultNumber(curPlayer);      // 모든 플레이어 카드 합산 결과 구함.
+                            twiceUpdate = true;
                         }
-                    }
-                    else if (isFirstBetEnd)     // 첫번째 베팅 종료 후. 왼쪽 카드 공개 후 마지막 베팅 시작.
-                    {
-                        DistributeCard(curPlayer, myPortIndex, arrPlayer, "third");
-                        OnLastBet();
-                        if (isLeftCard && !isLastBet && !isLastBetEnd)
+                        DistributeCard(curPlayer, myPortIndex, arrPlayer, "second");            // 가운데 카드를 공개했으므로 첫번째 베팅 시작.
+
+                        if (isChangeCard && !isLeftCard && !isFirstBet && !isFirstBetEnd)                // 가운데 카드가 공개된후. 첫 베팅 시작전.
+                        {
+                            OnFirstBet();       // 첫번째 베팅 시작. [ isFirstBet = false 로 변경됨]
+                        }
+                        else if (isFirstBet && !isFirstBetEnd)    // 첫번째 베팅이 시작했다면.
                         {
                             if (ismyTurn)           // 베팅중 나의 턴일때만 버튼 함수 실행시킴.
                             {
                                 OnBetting();        // 버튼 함수 활성화.
                             }
                         }
-                        else if (isLastBetEnd)      // 마지막 베팅 종료시 오른쪽 카드 공개. 플레이어 카드 합산 결과 함수 실행.
+                        else if (isFirstBetEnd)     // 첫번째 베팅 종료 후. 왼쪽 카드 공개 후 마지막 베팅 시작.
                         {
-                            ResultNumber(curPlayer);      // 모든 플레이어 카드 합산 결과 구함.
-                            DistributeCard(curPlayer, myPortIndex, arrPlayer, "last");          // step = "last" 일때 isDisplay = true로 바뀌므로 플레이어 상황에 따라 Loser , Winner 배너 공개해야함.
+                            DistributeCard(curPlayer, myPortIndex, arrPlayer, "third");
+                            OnLastBet();
+                            if (isLeftCard && !isLastBet && !isLastBetEnd)
+                            {
+                                if (ismyTurn)           // 베팅중 나의 턴일때만 버튼 함수 실행시킴.
+                                {
+                                    OnBetting();        // 버튼 함수 활성화.
+                                }
+                            }
+                            else if (isLastBetEnd)      // 마지막 베팅 종료시 오른쪽 카드 공개. 플레이어 카드 합산 결과 함수 실행.
+                            {
+                                DistributeCard(curPlayer, myPortIndex, arrPlayer, "last");          // step = "last" 일때 isDisplay = true로 바뀌므로 플레이어 상황에 따라 Loser , Winner 배너 공개해야함.
+                            }
                         }
                     }
                 }
@@ -183,22 +191,6 @@ public class GameManager_GM : MonoBehaviour
         { // 게임 종료 후, 다시 시작 버튼을 누를시 실행되야함.
 
         }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
         /*  임시로 가끔 서버없이 클라이언트만 확인해야할때 있어서 주석 처리해놓음
@@ -472,7 +464,6 @@ public class GameManager_GM : MonoBehaviour
         }
         else if (step == "second")           // 가운데 카드 공개
         {
-            Debug.Log("가운데 카드 공개");
             switch (myPlayerIndex)
             {
                 case 0:
@@ -649,7 +640,6 @@ public class GameManager_GM : MonoBehaviour
         }
         else if (step == "third")               // 왼쪽 카드 공개.
         {
-            Debug.Log("왼쪽 카드 공개");
             isLeftCard = true;
             switch (myPlayerIndex)
             {
@@ -724,7 +714,7 @@ public class GameManager_GM : MonoBehaviour
         }
         else if (step == "last")
         {
-            Debug.Log("오른쪽 카드 공개");
+            ServerManager.instance.EmitResult(myPortIndex);
             isRightCard = true;
             isDisplay = true;
             switch (myPlayerIndex)
@@ -884,39 +874,39 @@ public class GameManager_GM : MonoBehaviour
     /// <returns></returns>
     public void RandomCardIndex(int in_player)
     {
-        int rand01, rand02;
-        int[] array_temp = new int[cards.Length];
-        int variable_temp;
+        //int rand01, rand02;
+        //int[] array_temp = new int[cards.Length];
+        //int variable_temp;
 
-        int count = 0;
-        for (int i = 0; i < cards.Length; i++)
-        {
-            array_temp[i] = count;
-            count++;
-        }
+        //int count = 0;
+        //for (int i = 0; i < cards.Length; i++)
+        //{
+        //    array_temp[i] = count;
+        //    count++;
+        //}
 
 
-        for (int i = 0; i < in_player * 3; i++)
-        {
-            rand01 = Random.Range(1, cards.Length);
-            rand02 = Random.Range(1, cards.Length);
+        //for (int i = 0; i < in_player * 3; i++)
+        //{
+        //    rand01 = Random.Range(1, cards.Length);
+        //    rand02 = Random.Range(1, cards.Length);
 
-            variable_temp = array_temp[rand01];
-            array_temp[rand01] = array_temp[rand02];
-            array_temp[rand02] = variable_temp;
+        //    variable_temp = array_temp[rand01];
+        //    array_temp[rand01] = array_temp[rand02];
+        //    array_temp[rand02] = variable_temp;
 
-        }
+        //}
 
-        count = 1;
-        for (int i = 0; i < in_player; i++)
-        {
+        //count = 1;
+        //for (int i = 0; i < in_player; i++)
+        //{
 
-            for (int j = 0; j < 3; j++)
-            {
-                arrPlayer[i, j] = array_temp[count];
-                count++;
-            }
-        }
+        //    for (int j = 0; j < 3; j++)
+        //    {
+        //        arrPlayer[i, j] = array_temp[count];
+        //        count++;
+        //    }
+        //}
 
         arrPlayer = ServerManager.instance.arrPlayer;
 
@@ -1020,10 +1010,7 @@ public class GameManager_GM : MonoBehaviour
     /// <param name="in_player"> 현재 게임에 참여한 인원 </param>
     void ResultNumber(int in_player)
     {
-
         int[] resultPlayer = new int[in_player];         // 플레이어들의 합산 결과.
-
-
 
         for (int i = 0; i < in_player; i++)
         {
@@ -1137,6 +1124,13 @@ public class GameManager_GM : MonoBehaviour
         Debug.Log("player03 result : " + resultPlayer[2]);
         Debug.Log("player04 result : " + resultPlayer[3]);
         Debug.Log("player05 result : " + resultPlayer[4]);
+
+        if (myPortIndex == 4)
+        {
+            ServerManager.instance.EmitGameResult(resultPlayer);
+        }
     }
+
+
 
 }
