@@ -136,6 +136,7 @@ public class GameManager_GM : MonoBehaviour
                 OFFCardDrag();
                 if (!onceUpdated)
                 {
+                    BackPosition();
                     int[] list = { arrPlayer[myPortIndex, 0], arrPlayer[myPortIndex, 1], arrPlayer[myPortIndex, 2] };
                     ServerManager.instance.EmitDeicision(myPortIndex, list);
                     onceUpdated = true;

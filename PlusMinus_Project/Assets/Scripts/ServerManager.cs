@@ -190,7 +190,7 @@ public class ServerManager : MonoBehaviour
         form.betMoney = betMoney;
         form.totalMoney = totalMoney;
 
-        socket.EmitJson("batting", JsonUtility.ToJson(form));
+        socket.EmitJson("betting", JsonUtility.ToJson(form));
     }
 
     public void EmitGameResult(int[] result)
@@ -230,7 +230,7 @@ public class ServerManager : MonoBehaviour
         GameObject.Find("GameManager").GetComponent<GameManager_GM>().arrPlayer[form.index, 2] = 0;
     }
 
-    void OnPaseEnd()
+    void OnPaseEnd(string json)
     {
         if (!GameObject.Find("GameManager").GetComponent<GameManager_GM>().isFirstBetEnd)
         {
