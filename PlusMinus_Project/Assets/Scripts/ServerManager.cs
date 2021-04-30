@@ -89,6 +89,7 @@ public class ServerManager : MonoBehaviour
         socket.On("pick", OnPick);
         socket.On("gameReady", OnGameReady);
         socket.On("betting", OnBetting);
+        socket.On("die", OnDie);
         socket.On("paseEnd", OnPaseEnd);
         socket.On("gameEnd", OnGameEnd);
         socket.On("destory", OnDestroyRoom);
@@ -126,6 +127,8 @@ public class ServerManager : MonoBehaviour
         print("내 차례는" + form.yourTurn + "입니다");
 
         yourTurn = form.yourTurn;
+        firstData = true;
+        endData = false;
         SceneManager.LoadScene("InGame");
     }
 
@@ -178,9 +181,21 @@ public class ServerManager : MonoBehaviour
 
     }
 
-    void OnPaseEnd(string json)
+    void OnDie(string json)
     {
 
+    }
+
+    void OnPaseEnd()
+    {
+        if (!GameObject.Find("GameManager").GetComponent<GameManager_GM>().isFirstBetEnd)
+        {
+            GameObject.Find("GameManager").GetComponent<GameManager_GM>().isFirstBetEnd = true;
+        }
+        else if (!GameObject.Find("GameManager").GetComponent<GameManager_GM>().isLastBetEnd)
+        {
+            GameObject.Find("GameManager").GetComponent<GameManager_GM>().isFirstBetEnd = true;
+        }
     }
 
     void OnGameEnd(string json)
