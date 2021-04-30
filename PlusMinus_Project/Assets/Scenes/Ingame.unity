@@ -171,7 +171,7 @@ MonoBehaviour:
   expressionValue: 010000000200000003000000
   curPlayer: 5
   cards:
-  - {fileID: 21300000, guid: 243ba6c1402696846963d1b6f562b4c8, type: 3}
+  - {fileID: 21300000, guid: d70527160cc0c6b4c80ba6eb5802daff, type: 3}
   - {fileID: 21300000, guid: d8f3627b4d716f2409cd5fa0130ab243, type: 3}
   - {fileID: 21300000, guid: a8167d44fe485b14c9abbce30278b110, type: 3}
   - {fileID: 21300000, guid: 93095ef224323a74e81e8cb3e9adde42, type: 3}
@@ -247,8 +247,9 @@ MonoBehaviour:
   isLeftCard: 0
   isRightCard: 0
   isFirstBet: 1
+  isFirstBetEnd: 0
   isLastBet: 1
-  isResult: 0
+  isLastBetEnd: 0
   isDisplay: 0
   isGameOver: 0
   set_turnTime: 10
