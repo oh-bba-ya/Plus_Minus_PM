@@ -125,7 +125,8 @@ public class GameManager_GM : MonoBehaviour
                 OffBetting();
                 if (!isCheckCard)
                 {
-                    timebar.value -= inGameTime*0.01f*0.3f;
+                    timebar.value -= inGameTime*0.0001f*1.6f;
+                    
                     StartCoroutine(ClickCard(myPortIndex));
                 }
                 else
