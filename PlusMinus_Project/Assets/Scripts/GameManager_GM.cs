@@ -83,6 +83,7 @@ public class GameManager_GM : MonoBehaviour
 
     public Slider slider;
 
+
     // Start is called before the first frame update
     void Start()
     {
@@ -100,6 +101,7 @@ public class GameManager_GM : MonoBehaviour
             startPos[i] = originPos[i].transform.position;
         }
 
+        //칩 쌓기 테스트
         //int[] testplayer = { 0, 1, 2, 3, 4 };
         //int[,] testcards = { { 0, 1, 2 }, { 3, 4, 5 } };
 
@@ -123,7 +125,7 @@ public class GameManager_GM : MonoBehaviour
                 OffBetting();
                 if (!isCheckCard)
                 {
-                    Debug.Log(inGameTime);
+                    //Debug.Log(inGameTime);
                     slider.value -= inGameTime*0.001f;
                     StartCoroutine(ClickCard(myPortIndex));
                 }
@@ -882,39 +884,39 @@ public class GameManager_GM : MonoBehaviour
     /// <returns></returns>
     public void RandomCardIndex(int in_player)
     {
-        //int rand01, rand02;
-        //int[] array_temp = new int[cards.Length];
-        //int variable_temp;
+        int rand01, rand02;
+        int[] array_temp = new int[cards.Length];
+        int variable_temp;
 
-        //int count = 0;
-        //for (int i = 0; i < cards.Length; i++)
-        //{
-        //    array_temp[i] = count;
-        //    count++;
-        //}
+        int count = 0;
+        for (int i = 0; i < cards.Length; i++)
+        {
+            array_temp[i] = count;
+            count++;
+        }
 
 
-        //for (int i = 0; i < in_player * 3; i++)
-        //{
-        //    rand01 = Random.Range(1, cards.Length);
-        //    rand02 = Random.Range(1, cards.Length);
+        for (int i = 0; i < in_player * 3; i++)
+        {
+            rand01 = Random.Range(1, cards.Length);
+            rand02 = Random.Range(1, cards.Length);
 
-        //    variable_temp = array_temp[rand01];
-        //    array_temp[rand01] = array_temp[rand02];
-        //    array_temp[rand02] = variable_temp;
+            variable_temp = array_temp[rand01];
+            array_temp[rand01] = array_temp[rand02];
+            array_temp[rand02] = variable_temp;
 
-        //}
+        }
 
-        //count = 1;
-        //for (int i = 0; i < in_player; i++)
-        //{
+        count = 1;
+        for (int i = 0; i < in_player; i++)
+        {
 
-        //    for (int j = 0; j < 3; j++)
-        //    {
-        //        arrPlayer[i, j] = array_temp[count];
-        //        count++;
-        //    }
-        //}
+            for (int j = 0; j < 3; j++)
+            {
+                arrPlayer[i, j] = array_temp[count];
+                count++;
+            }
+        }
 
         arrPlayer = ServerManager.instance.arrPlayer;
 
@@ -1136,7 +1138,5 @@ public class GameManager_GM : MonoBehaviour
         Debug.Log("player04 result : " + resultPlayer[3]);
         Debug.Log("player05 result : " + resultPlayer[4]);
     }
-
-
 
 }
