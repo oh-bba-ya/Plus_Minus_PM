@@ -8,7 +8,9 @@ public class stackChip : MonoBehaviour
     //GameObject chip1;
     public List<GameObject> Slot = new List<GameObject>();
     public GameObject myObject;
-    public Button Check;
+    public List<GameObject> Chips = new List<GameObject>();
+    public Button Check; public Button gameQuit;
+    public Button gameRestart;
     int maxChips = 10;
 
     public GameObject AudioBg;
@@ -26,7 +28,10 @@ public class stackChip : MonoBehaviour
         winner.SetActive(false);
         loser.SetActive(false);
         draw.SetActive(false);
+        gameRestart.enabled = false;
+        gameQuit.enabled = false;
     }
+  
     // Update is called once per frame
     void Update()
     {
@@ -37,13 +42,18 @@ public class stackChip : MonoBehaviour
     {
         if(maxChips > 0)
         {
-            int slotI = Random.Range(0, 2);
-
-            GameObject myChip = Instantiate(myObject, Slot[slotI].transform.position, Quaternion.identity) as GameObject;
-
-            myChip.transform.SetParent(Slot[slotI].transform);
+            int amount = Random.Range(0, 3);
             
-            maxChips--;
+            for(int i = 0; i < amount; i++)
+            {
+                int slotI = Random.Range(0, Slot.Count);
+                int chipI = Random.Range(0, Chips.Count);
+                GameObject myChip = Instantiate(Chips[chipI], Slot[slotI].transform.position, Quaternion.identity) as GameObject;
+                myChip.transform.SetParent(Slot[slotI].transform);
+                maxChips--;
+
+            }
+            
         }        
     }
 
@@ -59,20 +69,25 @@ public class stackChip : MonoBehaviour
         {
             AudioBg.SetActive(true);
         }
-        else if (isWinner)
+        else if (isWinner || isLoser || isDraw)
         {
-            AudioBg.SetActive(false);
-            winner.SetActive(true);
-        }
-        else if (isLoser)
-        {
-            AudioBg.SetActive(false);
-            loser.SetActive(true);
-        }
-        else
-        {
-            AudioBg.SetActive(false);
-            draw.SetActive(true);
+            gameQuit.enabled = true;
+            gameRestart.enabled = true;
+            if (isWinner)
+            {
+                AudioBg.SetActive(false);
+                winner.SetActive(true);
+            }
+            else if (isLoser)
+            {
+                AudioBg.SetActive(false);
+                loser.SetActive(true);
+            }
+            else
+            {
+                AudioBg.SetActive(false);
+                draw.SetActive(true);
+            }
         }
 
     }

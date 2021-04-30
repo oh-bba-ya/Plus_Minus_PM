@@ -125,8 +125,7 @@ public class GameManager_GM : MonoBehaviour
                 OffBetting();
                 if (!isCheckCard)
                 {
-                    timebar.value -= inGameTime*0.0001f*1.6f;
-                    
+                    timebar.value -= inGameTime*0.0001f*1.5f;
                     StartCoroutine(ClickCard(myPortIndex));
                 }
                 else
@@ -164,15 +163,19 @@ public class GameManager_GM : MonoBehaviour
                         if (isChangeCard && !isLeftCard && !isFirstBet && !isFirstBetEnd)                // 가운데 카드가 공개된후. 첫 베팅 시작전.
                         {
                             OnFirstBet();       // 첫번째 베팅 시작. [ isFirstBet = false 로 변경됨]
+
                         }
                         else if (isFirstBet && !isFirstBetEnd)    // 첫번째 베팅이 시작했다면.
                         {
                             if (ismyTurn)           // 베팅중 나의 턴일때만 버튼 함수 실행시킴.
                             {
+                                timebar.value -= inGameTime * 0.0001f * 1.5f; 
                                 OnBetting();        // 버튼 함수 활성화.
+
                             }
                             else
                             {
+                                timebar.value = 1f;
                                 OffBetting();
                             }
                         }
@@ -184,10 +187,12 @@ public class GameManager_GM : MonoBehaviour
                             {
                                 if (ismyTurn)           // 베팅중 나의 턴일때만 버튼 함수 실행시킴.
                                 {
+                                    timebar.value -= inGameTime * 0.0001f * 1.5f;
                                     OnBetting();        // 버튼 함수 활성화.
                                 }
                                 else
                                 {
+                                    timebar.value = 1f;
                                     OffBetting();
                                 }
                             }
