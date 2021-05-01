@@ -52,6 +52,7 @@ public class GameManager_GM : MonoBehaviour
     public bool isLastBetEnd = false;                   // 두번째 베팅 종료
     public bool isDisplay = false;                      // 오른쪽 카드 공개 후 Loser, Winner 배너 공개.
     public bool isGameOver = false;                     // 게임 종료 , 다시 시작 버튼 생성
+    public bool isPreBet = false;                       // 초기화.
 
     public int set_turnTime = 10;                //  카드 배치 , 카드 확인 시간 설정.
     public float inGameTime = 0;                      // 게임 진행시간.
@@ -112,7 +113,7 @@ public class GameManager_GM : MonoBehaviour
     bool onceUpdated = false;
     bool twiceUpdate = false;
     bool threeUpdate = false;
-
+    bool fourUpdate = false;
     // Update is called once per frame
     void Update()
     {
@@ -182,6 +183,11 @@ public class GameManager_GM : MonoBehaviour
                         }
                         else if (isFirstBetEnd)     // 첫번째 베팅 종료 후. 왼쪽 카드 공개 후 마지막 베팅 시작.
                         {
+                            if (!fourUpdate)
+                            {
+                                my_PreBetMoney = 0;
+                                fourUpdate = true;
+                            }
                             DistributeCard(curPlayer, myPortIndex, arrPlayer, "third");
                             OnLastBet();
                             if (isLeftCard && !isLastBet && !isLastBetEnd)
@@ -369,6 +375,9 @@ public class GameManager_GM : MonoBehaviour
         OffBetting();
     }
 
+    /// <summary>
+    /// 2번째 베팅 시작.
+    /// </summary>
     void OnLastBet()
     {
         isLastBet = false;
@@ -956,7 +965,7 @@ public class GameManager_GM : MonoBehaviour
             my_PreBetMoney = betMoney;
             ServerManager.instance.EmitBetting(myPortIndex, betMoney, totalMoney);
         }
-        else if (betMoney - my_PreBetMoney != 0)
+        else if (betMoney - my_PreBetMoney != 0 )
         {
             int restBetMoney = betMoney - my_PreBetMoney;
             totalMoney += restBetMoney;
