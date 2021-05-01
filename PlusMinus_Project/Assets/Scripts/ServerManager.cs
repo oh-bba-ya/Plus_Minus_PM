@@ -163,8 +163,9 @@ public class ServerManager : MonoBehaviour
     {
         DecisionRequestForm form = new DecisionRequestForm();
         form.index = index;
-        form.decision = decision;
-
+        form.decision[0] = decision[0];
+        form.decision[1] = decision[1];
+        form.decision[2] = decision[2];
         socket.EmitJson("decision", JsonUtility.ToJson(form));
     }
 

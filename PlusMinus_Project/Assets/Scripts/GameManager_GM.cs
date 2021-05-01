@@ -103,13 +103,12 @@ public class GameManager_GM : MonoBehaviour
         //int[] testplayer = { 0, 1, 2, 3, 4 };
         //int[,] testcards = { { 0, 1, 2 }, { 3, 4, 5 } };
 
-        DistributeCard(curPlayer, myPortIndex, arrPlayer, "first");
-
         BaseBettingStart();
 
         Save(myPortIndex);
     }
 
+    bool firstStep = false;
     bool onceUpdated = false;
     bool twiceUpdate = false;
     bool threeUpdate = false;
@@ -117,84 +116,69 @@ public class GameManager_GM : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        inGameTime += Time.deltaTime;
         DisplayStepByStep();            // 판돈 금액 표시 , 현재 베팅 금액 표시 , 단계별 안내문 표시.
 
         if (!isGameOver)
         {
-            if (inGameTime <= set_turnTime)             // 설정된 시간 전까지는 카드 한장 확인과 , 3장의 카드 Drag&Drop 가능. 베팅 버튼도 비활성화.
+            if (!firstStep && !ServerManager.instance.firstData)
             {
-                OffBetting();
-                if (!isCheckCard)
-                {
-                    timebar.value -= inGameTime*0.0001f*1.5f;
-                    StartCoroutine(ClickCard(myPortIndex));
-                }
-                else
-                {
-                    StopCheckCard();
-                }
+                DistributeCard(curPlayer, myPortIndex, arrPlayer, "first");
+                firstStep = true;
             }
-            else if (inGameTime > set_turnTime)      // 설정된 시간 이후 3장의 카드 Drag&Drop 불가능
+            else
             {
-                OFFCardDrag();
-                if (!onceUpdated)
+                inGameTime += Time.deltaTime;
+                if (inGameTime <= set_turnTime)             // 설정된 시간 전까지는 카드 한장 확인과 , 3장의 카드 Drag&Drop 가능. 베팅 버튼도 비활성화.
                 {
-                    BackPosition();
-                    int[] list = { arrPlayer[myPortIndex, 0], arrPlayer[myPortIndex, 1], arrPlayer[myPortIndex, 2] };
-                    ServerManager.instance.EmitDeicision(myPortIndex, list);
-                    onceUpdated = true;
-                }
-                else
-                {
-                    if (!isCheckCard)        // 설정된 시간 이후에도 카드 확인이 완료되지 않았다면 가운데 카드 자동 확인.
+                    OffBetting();
+                    if (!isCheckCard)
                     {
-                        AutoCheck(myPortIndex);
+                        timebar.value -= inGameTime * 0.0001f * 1.5f;
+                        StartCoroutine(ClickCard(myPortIndex));
                     }
-                    else if (ServerManager.instance.endData)    // 모든 유저들이 카드를 바꾼 정보가 서버에서 취합완료됬으므로 가운데 카드 공개되자마자 + / - / * 중 하나로 바뀜.
+                    else
                     {
-                        arrPlayer = ServerManager.instance.arrPlayer;
-                        if (!twiceUpdate)
+                        StopCheckCard();
+                    }
+                }
+                else if (inGameTime > set_turnTime)      // 설정된 시간 이후 3장의 카드 Drag&Drop 불가능
+                {
+                    OFFCardDrag();
+                    if (!onceUpdated)
+                    {
+                        BackPosition();
+                        int[] list = { arrPlayer[myPortIndex, 0], arrPlayer[myPortIndex, 1], arrPlayer[myPortIndex, 2] };
+                        ServerManager.instance.EmitDeicision(myPortIndex, list);
+                        onceUpdated = true;
+                    }
+                    else
+                    {
+                        if (!isCheckCard)        // 설정된 시간 이후에도 카드 확인이 완료되지 않았다면 가운데 카드 자동 확인.
                         {
-                            ResultNumber(curPlayer);      // 모든 플레이어 카드 합산 결과 구함.
-                            twiceUpdate = true;
+                            AutoCheck(myPortIndex);
                         }
-                        DistributeCard(curPlayer, myPortIndex, arrPlayer, "second");            // 가운데 카드를 공개했으므로 첫번째 베팅 시작.
-
-                        if (isChangeCard && !isLeftCard && !isFirstBet && !isFirstBetEnd)                // 가운데 카드가 공개된후. 첫 베팅 시작전.
+                        else if (ServerManager.instance.endData)    // 모든 유저들이 카드를 바꾼 정보가 서버에서 취합완료됬으므로 가운데 카드 공개되자마자 + / - / * 중 하나로 바뀜.
                         {
-                            OnFirstBet();       // 첫번째 베팅 시작. [ isFirstBet = false 로 변경됨]
-
-                        }
-                        else if (isFirstBet && !isFirstBetEnd)    // 첫번째 베팅이 시작했다면.
-                        {
-                            if (ismyTurn)           // 베팅중 나의 턴일때만 버튼 함수 실행시킴.
+                            arrPlayer = ServerManager.instance.arrPlayer;
+                            if (!twiceUpdate)
                             {
-                                timebar.value -= inGameTime * 0.0001f * 1.5f; 
-                                OnBetting();        // 버튼 함수 활성화.
+                                ResultNumber(curPlayer);      // 모든 플레이어 카드 합산 결과 구함.
+                                twiceUpdate = true;
+                            }
+                            DistributeCard(curPlayer, myPortIndex, arrPlayer, "second");            // 가운데 카드를 공개했으므로 첫번째 베팅 시작.
+
+                            if (isChangeCard && !isLeftCard && !isFirstBet && !isFirstBetEnd)                // 가운데 카드가 공개된후. 첫 베팅 시작전.
+                            {
+                                OnFirstBet();       // 첫번째 베팅 시작. [ isFirstBet = false 로 변경됨]
 
                             }
-                            else
-                            {
-                                timebar.value = 1f;
-                                OffBetting();
-                            }
-                        }
-                        else if (isFirstBetEnd)     // 첫번째 베팅 종료 후. 왼쪽 카드 공개 후 마지막 베팅 시작.
-                        {
-                            if (!fourUpdate)
-                            {
-                                my_PreBetMoney = 0;
-                                fourUpdate = true;
-                            }
-                            DistributeCard(curPlayer, myPortIndex, arrPlayer, "third");
-                            OnLastBet();
-                            if (isLeftCard && !isLastBet && !isLastBetEnd)
+                            else if (isFirstBet && !isFirstBetEnd)    // 첫번째 베팅이 시작했다면.
                             {
                                 if (ismyTurn)           // 베팅중 나의 턴일때만 버튼 함수 실행시킴.
                                 {
                                     timebar.value -= inGameTime * 0.0001f * 1.5f;
                                     OnBetting();        // 버튼 함수 활성화.
+
                                 }
                                 else
                                 {
@@ -202,14 +186,37 @@ public class GameManager_GM : MonoBehaviour
                                     OffBetting();
                                 }
                             }
-                            else if (isLastBetEnd)      // 마지막 베팅 종료시 오른쪽 카드 공개. 플레이어 카드 합산 결과 함수 실행.
+                            else if (isFirstBetEnd)     // 첫번째 베팅 종료 후. 왼쪽 카드 공개 후 마지막 베팅 시작.
                             {
-                                if (!threeUpdate)
+                                if (!fourUpdate)
                                 {
-                                    ServerManager.instance.EmitResult(myPortIndex);
-                                    threeUpdate = true;
+                                    my_PreBetMoney = 0;
+                                    fourUpdate = true;
                                 }
-                                DistributeCard(curPlayer, myPortIndex, arrPlayer, "last");          // step = "last" 일때 isDisplay = true로 바뀌므로 플레이어 상황에 따라 Loser , Winner 배너 공개해야함.
+                                DistributeCard(curPlayer, myPortIndex, arrPlayer, "third");
+                                OnLastBet();
+                                if (isLeftCard && !isLastBet && !isLastBetEnd)
+                                {
+                                    if (ismyTurn)           // 베팅중 나의 턴일때만 버튼 함수 실행시킴.
+                                    {
+                                        timebar.value -= inGameTime * 0.0001f * 1.5f;
+                                        OnBetting();        // 버튼 함수 활성화.
+                                    }
+                                    else
+                                    {
+                                        timebar.value = 1f;
+                                        OffBetting();
+                                    }
+                                }
+                                else if (isLastBetEnd)      // 마지막 베팅 종료시 오른쪽 카드 공개. 플레이어 카드 합산 결과 함수 실행.
+                                {
+                                    if (!threeUpdate)
+                                    {
+                                        ServerManager.instance.EmitResult(myPortIndex);
+                                        threeUpdate = true;
+                                    }
+                                    DistributeCard(curPlayer, myPortIndex, arrPlayer, "last");          // step = "last" 일때 isDisplay = true로 바뀌므로 플레이어 상황에 따라 Loser , Winner 배너 공개해야함.
+                                }
                             }
                         }
                     }
@@ -316,8 +323,6 @@ public class GameManager_GM : MonoBehaviour
     {
         isLastBetEnd = _OffLastBet;
     }
-
-
 
     void DisplayStepByStep()
     {
@@ -491,8 +496,6 @@ public class GameManager_GM : MonoBehaviour
                 players[i].handcard[1].GetComponent<SpriteRenderer>().sprite = cards[0];
                 players[i].handcard[2].GetComponent<SpriteRenderer>().sprite = cards[0];
             }
-
-
         }
         else if (step == "second")           // 가운데 카드 공개
         {
@@ -939,7 +942,13 @@ public class GameManager_GM : MonoBehaviour
         //    }
         //}
 
-        arrPlayer = ServerManager.instance.arrPlayer;
+        for (int i = 0; i < 5; i++)
+        {
+            for (int j = 0; j < 3; j++)
+            {
+                arrPlayer[i,j] = ServerManager.instance.arrPlayer[i,j];
+            }
+        }
 
         //서버로 코드 옮김
         Debug.Log("card 01 : " + arrPlayer[0, 0] + ", " + arrPlayer[0, 1] + ", " + arrPlayer[0, 2]);
