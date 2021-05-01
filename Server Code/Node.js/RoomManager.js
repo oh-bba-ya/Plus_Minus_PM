@@ -18,15 +18,15 @@ function RoomManager(io){
       RmMg.roomIndex[p.socket.id] = roomNum;
     }
 
-    var tmpArray = new Array(54);
+    var tmpArray = new Array(55);
 
-    for (var i = 0; i < 54; i++){
+    for (var i = 0; i < 55; i++){
       tmpArray[i] = i;
     }
 
     for(var i = 0; i < 15; i++){
-      var rand1 = Math.floor(Math.random() * 54 + 1);
-      var rand2 = Math.floor(Math.random() * 54 + 1);
+      var rand1 = Math.floor(Math.random() * 54) + 1;
+      var rand2 = Math.floor(Math.random() * 54) + 1;
 
       var tmpVar = tmpArray[rand1];
       tmpArray[rand1] = tmpArray[rand2];
@@ -36,9 +36,10 @@ function RoomManager(io){
     var cnt = 1;
     for (var i = 0; i < 5; i++){
       for (var j = 0; j < 3; j++){
-        playerCards[i][j] = tmpArray[cnt++];
+        room.playerCards[i][j] = tmpArray[cnt++];
       }
     }
+    room.playerNum = 5;
 
     console.log("Room Created :", roomNum);
 
@@ -63,14 +64,18 @@ function Room(num, players)
 {
   this.num = num;
   this.players = players;
+  this.playerNum = 0;
   this.playerCards = new Array(5);
   for(var i = 0; i < 5; i++){
-    playerCards[i] = new Array(3);
+    this.playerCards[i] = new Array(3);
   }
 
   this.phase = 1;
-  this.winnerIndex = -1;
   this.totalMoney = 0;
+  this.playerScore = new Array(5);
+  for(var i = 0; i < 5; i++){
+    this.playerScore[i] = 0;
+  }
   this.playerDecision = new Array(5);
   for(var i = 0; i < 5; i++){
     this.playerDecision[i] = false;

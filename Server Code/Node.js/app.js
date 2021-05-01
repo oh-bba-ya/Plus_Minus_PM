@@ -2,7 +2,6 @@ var io = require('socket.io')({
 	transports: ['websocket'],
 });
 io.attach(4000);
-var userList = [];
 console.log('server is on port 4000');
 
 var lobbyManager = new (require('./LobbyManager.js'))(io);
@@ -28,8 +27,8 @@ io.on('connection', function(socket){
 
 	socket.on('gameReady', function(){
 		var roomNum = roomManager.roomIndex[socket.id];
-
-		io.to(roomNum).emit('gameReady', {arrPlayer : roomManager.rooms[roomNum].playerCards});
+		console.log(roomManager.rooms[roomNum].playerCards);
+		socket.emit('gameReady', {arrPlayer : roomManager.rooms[roomNum].playerCards});
 	});
 
 	socket.on('decision', function(data){
@@ -40,6 +39,7 @@ io.on('connection', function(socket){
 			room.playerCards[data.index][i] = data.decision[i];
 		}
 		room.playerDecision[data.index] = true;
+		console.log(data.index, "번 : ", data.decision[0], ", " , data.decision[i], ", " data.decision[2]);
 
 		var allDone = true;
 		for(var i = 0; i < 5; i++){
@@ -50,7 +50,21 @@ io.on('connection', function(socket){
 		}
 
 		if(allDone){
+			console.log("모든 유저 선택 완료");
+			console.log(roomManager.rooms[roomNum].playerCards)
 			io.to(roomNum).emit('gameReady', {arrPlayer : roomManager.rooms[roomNum].playerCards});
+			room.players[0].socket.emit('yourTurn', {turn : 0})
+		}
+	});
+
+	socket.on('gameResult', function(data){
+		var roomNum = roomManager.roomIndex[socket.id];
+		var room = roomManager.rooms[roomNum];
+		var result = data.playerResult;
+
+		for (var i = 0; i < 5; i++){
+			room.playerScore[i] = result[i];
+			console.log(i, "번의 결과 : ", result[i]);
 		}
 	});
 
@@ -60,42 +74,83 @@ io.on('connection', function(socket){
 		var index = data.index;
 		var betMoney = data.betMoney;
 
-		room.totalMoney = data.totalMoney;
 		if(betMoney == -1){
+			console.log(index, "번 다이");
+			room.playerDieStatus[index] = true;
 			socket.broadcast.to(roomNum).emit('die', {dieIndex : index})
 		}
 		else{
+			console.log(index, "번이 ", betMoney, "원 배팅");
 			room.playerBetStatus[index] = betMoney;
+			room.totalMoney += data.betMoney;
 			socket.broadcast.to(roomNum).emit('betting', data);
 		}
 
 		index = (index + 1) % 5;
+		console.log(index);
 		var gameDone = true;
 		if(index == 0){
-			var betNormal = room.playerBetStatus[0];
-			for(var i = 1; i < 5; i++){
-				if(betNormal != room.playerBetStatus[i]){
+			var betNormal = Math.max.apply(null, room.playerBetStatus);
+			console.log("가장 큰 배팅 금액 : ", betNormal);
+			for(var i = 0; i < 5; i++){
+				if(room.playerDieStatus[i] == true && betNormal != room.playerBetStatus[i]){
 					gameDone = false;
 				}
 			}
+			for(var i = 0; i < 5; i++){
+				room.playerBetStatus[i] = 0;
+			}
+		}
+		else{
+			gameDone = false;
 		}
 
 		if(gameDone){
 			for(var i = 0; i < 5; i++){
-				room.players[i].socket.emit("paseEnd");
+				console.log("페이즈 종료");
+				room.players[i].socket.emit("paseEnd", {a : "a"});
+				room.playerBetStatus[i] = 0;
 			}
+
+			room.players[0].socket.emit("yourTurn", {turn : index});
 		}
 		else{
+			while(room.playerDieStatus[index]){
+
+			}
 			room.players[index].socket.emit("yourTurn", {turn : index});
 		}
 	});
 
 	socket.on('result', (data)=>{
+		if(matching){
+			console.log("게임 끝");
 			var roomNum = roomManager.roomIndex[socket.id];
 			var room = roomManager.rooms[roomNum];
+
+			var winnerIndex = -1;
+			var liveArray = [];
+			for (var i = 0; i < 5; i++)
+			{
+				if(room.playerDieStatus[i] == false){
+					liveArray.push(room.playerScore[i]);
+				}
+				else{
+					liveArray.push(0);
+				}
+			}
+			var maxScore = Math.max.apply(null, liveArray);
+			for(var i = 0; i < 5; i++){
+				if(maxScore == liveArray[i]){
+					winnerIndex = i;
+				}
+			}
+
+			console.log("승리자는 ", winnerIndex, "번 입니다");
+
 			if(room != undefined)
 			{
-				if(data.index == room.winnerIndex){
+				if(data.index == winnerIndex){
 					room.players[data.index].socket.emit('gameEnd', {addMoney : room.totalMoney});
 				}
 				else{
@@ -103,10 +158,14 @@ io.on('connection', function(socket){
 				}
 			}
 
-			if(roomNum){
-				roomManager.rooms[roomNum].playerCnt--;
+			if(room.playerNum == 0){
 				roomManager.destroy(roomNum, lobbyManager);
 			}
+			else{
+				room.playerNum -= 1;
+			}
+			matching = false;
+		}
 	});
 
 	socket.on('disconnect', function(){

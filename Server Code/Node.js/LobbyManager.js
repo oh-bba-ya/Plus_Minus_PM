@@ -1,6 +1,5 @@
 function LobbyManager(io){
   var LbMg = this;
-  LbMg.lobby = [];
   LbMg.people = [];
 
   LbMg.push = function(data){
