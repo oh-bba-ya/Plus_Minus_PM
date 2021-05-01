@@ -960,7 +960,7 @@ public class GameManager_GM : MonoBehaviour
             my_PreBetMoney = betMoney;
             ServerManager.instance.EmitBetting(myPortIndex, restBetMoney, totalMoney);
         }
-
+        ismyTurn = false;
     }
 
     /// <summary>
@@ -976,6 +976,7 @@ public class GameManager_GM : MonoBehaviour
         playerMoney = playerMoney - betMoney;
         players[myPortIndex].money = playerMoney;
         ServerManager.instance.EmitBetting(myPortIndex, betMoney, totalMoney);
+        ismyTurn = false;
     }
 
     /// <summary>
@@ -991,6 +992,7 @@ public class GameManager_GM : MonoBehaviour
         totalMoney += betMoney;
         players[myPortIndex].money = playerMoney;
         ServerManager.instance.EmitBetting(myPortIndex, betMoney, totalMoney);
+        ismyTurn = false;
     }
 
     /// <summary>
@@ -1019,6 +1021,7 @@ public class GameManager_GM : MonoBehaviour
         players[myPortIndex].money = playerMoney;
 
         ServerManager.instance.EmitBetting(myPortIndex, -1, totalMoney);
+        ismyTurn = false;
     }
 
     /// <summary>

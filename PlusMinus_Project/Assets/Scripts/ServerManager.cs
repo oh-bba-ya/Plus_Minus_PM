@@ -66,6 +66,14 @@ public class GameEndResponseForm
     public int addMoney;
 }
 
+[System.Serializable]
+public class BettingResponseForm
+{
+    public int index;
+    public int betMoney;
+    public int totalMoney;
+}
+
 #endregion
 
 public class ServerManager : MonoBehaviour
@@ -219,7 +227,8 @@ public class ServerManager : MonoBehaviour
 
     void OnBetting(string json)
     {
-
+        BettingResponseForm form = JsonUtility.FromJson<BettingResponseForm>(json);
+        GameObject.Find("GameManager").GetComponent<GameManager_GM>().totalMoney = form.totalMoney;
     }
 
     void OnDie(string json)
@@ -249,6 +258,14 @@ public class ServerManager : MonoBehaviour
         currentMoney += form.addMoney;
         PlayerPrefs.SetInt("Money", currentMoney);
         RefreshMoney();
+        if(form.addMoney == 0)
+        {
+            GameObject.Find("extraManager").GetComponent<stackChip>().isLoser = true;
+        }
+        else
+        {
+            GameObject.Find("extraManager").GetComponent<stackChip>().isWinner = true;
+        }
     }
 
     void OnDestroyRoom(string json)
