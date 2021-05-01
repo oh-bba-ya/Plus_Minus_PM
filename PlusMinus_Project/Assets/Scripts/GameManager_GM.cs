@@ -111,6 +111,7 @@ public class GameManager_GM : MonoBehaviour
 
     bool onceUpdated = false;
     bool twiceUpdate = false;
+    bool threeUpdate = false;
 
     // Update is called once per frame
     void Update()
@@ -198,6 +199,11 @@ public class GameManager_GM : MonoBehaviour
                             }
                             else if (isLastBetEnd)      // 마지막 베팅 종료시 오른쪽 카드 공개. 플레이어 카드 합산 결과 함수 실행.
                             {
+                                if (!threeUpdate)
+                                {
+                                    ServerManager.instance.EmitResult(myPortIndex);
+                                    threeUpdate = true;
+                                }
                                 DistributeCard(curPlayer, myPortIndex, arrPlayer, "last");          // step = "last" 일때 isDisplay = true로 바뀌므로 플레이어 상황에 따라 Loser , Winner 배너 공개해야함.
                             }
                         }
@@ -732,7 +738,6 @@ public class GameManager_GM : MonoBehaviour
         }
         else if (step == "last")
         {
-            ServerManager.instance.EmitResult(myPortIndex);
             isRightCard = true;
             isDisplay = true;
             switch (myPlayerIndex)

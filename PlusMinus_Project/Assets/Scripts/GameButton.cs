@@ -53,6 +53,7 @@ public class GameButton : MonoBehaviour
 
     public void ReStart()
     {
-        SceneManager.LoadScene("Maching");
+        Destroy(ServerManager.instance);
+        SceneManager.LoadScene("Matching");
     }
 }
