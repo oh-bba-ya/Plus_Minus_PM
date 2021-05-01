@@ -132,7 +132,6 @@ public class GameManager_GM : MonoBehaviour
                 }
                 else
                 {
-                    timebar.value = 1f;
                     StopCheckCard();
                 }
             }
