@@ -39,7 +39,7 @@ io.on('connection', function(socket){
 			room.playerCards[data.index][i] = data.decision[i];
 		}
 		room.playerDecision[data.index] = true;
-		console.log(data.index, "번 : ", data.decision[0], ", " , data.decision[i], ", " data.decision[2]);
+		console.log(data.index, "번 : ", data.decision[0], ", " , data.decision[1], ", ", data.decision[2]);
 
 		var allDone = true;
 		for(var i = 0; i < 5; i++){
