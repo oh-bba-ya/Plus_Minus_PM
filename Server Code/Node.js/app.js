@@ -53,6 +53,7 @@ io.on('connection', function(socket){
 			console.log("모든 유저 선택 완료");
 			console.log(roomManager.rooms[roomNum].playerCards)
 			io.to(roomNum).emit('gameReady', {arrPlayer : roomManager.rooms[roomNum].playerCards});
+			console.log("0번 차례");
 			room.players[0].socket.emit('yourTurn', {turn : 0})
 		}
 	});
@@ -93,7 +94,7 @@ io.on('connection', function(socket){
 			var betNormal = Math.max.apply(null, room.playerBetStatus);
 			console.log("가장 큰 배팅 금액 : ", betNormal);
 			for(var i = 0; i < 5; i++){
-				if(room.playerDieStatus[i] == true && betNormal != room.playerBetStatus[i]){
+				if(room.playerDieStatus[i] == false && betNormal != room.playerBetStatus[i]){
 					gameDone = false;
 				}
 			}
@@ -106,18 +107,23 @@ io.on('connection', function(socket){
 		}
 
 		if(gameDone){
+			console.log("페이즈 종료");
 			for(var i = 0; i < 5; i++){
-				console.log("페이즈 종료");
 				room.players[i].socket.emit("paseEnd", {a : "a"});
 				room.playerBetStatus[i] = 0;
 			}
-
-			room.players[0].socket.emit("yourTurn", {turn : index});
+			while(room.playerDieStatus[index]){
+				index+=1;
+			}
+			console.log(index, "번 차례");
+			room.players[index].socket.emit("yourTurn", {turn : index});
 		}
 		else{
 			while(room.playerDieStatus[index]){
-
+				index+=1;
+				console.log(index);
 			}
+			console.log(index, "번 차례");
 			room.players[index].socket.emit("yourTurn", {turn : index});
 		}
 	});
