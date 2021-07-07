@@ -1,6 +1,8 @@
 # 덧뺄
 
 ## Video
+https://drive.google.com/file/d/1drk6DCHn2IxOLA856QMRX5a4ONlqXK0M/view?usp=sharing  
+
 
 
 ### (1) 개요
