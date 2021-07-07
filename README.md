@@ -39,7 +39,7 @@ https://drive.google.com/file/d/1drk6DCHn2IxOLA856QMRX5a4ONlqXK0M/view?usp=shari
 <img src="https://user-images.githubusercontent.com/49023743/124744763-0d697d80-df5a-11eb-8475-0b65e7938122.PNG"> 
 
 
-### (4) 게임 방법 (순서) - (예시 이미지는 )
+### (4) 게임 방법 (순서) - (예시 이미지는 순서 번호와 연계되지 않습니다. )
 1. 참여한 플레이어들은 3장의 카드를 뒷면이 보이는 상태로 받습니다.
 <img src="https://user-images.githubusercontent.com/49023743/124744825-1c503000-df5a-11eb-9a60-6a02722e3611.PNG" width = "500" height ="300">
 2. 모든 플레이어들은 3장의 카드 중 단 한장의 카드 숫자를 본인만 확인합니다.
@@ -66,3 +66,10 @@ https://drive.google.com/file/d/1drk6DCHn2IxOLA856QMRX5a4ONlqXK0M/view?usp=shari
 
 ### (5) 사용된 알고리즘
 1. Shuffle
+
+### (6) 게임 문제 보고
+1. 멀티 게임으로 총 5명의 인원으로서만 게임이 시작됩니다.
+2. 마지막 오른쪽 카드가 공개 된 후 바로 결과가 나오기 때문에 
+3. 설정된 카드 위치가 게임이 시작된 후 위치가 변경되어 있습니다.
+4. 모바일로는 실행되지 않습니다.
+5. 
