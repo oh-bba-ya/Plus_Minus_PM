@@ -41,7 +41,7 @@ https://drive.google.com/file/d/1drk6DCHn2IxOLA856QMRX5a4ONlqXK0M/view?usp=shari
 
 ### (4) 게임 방법 (순서)
 1. 참여한 플레이어들은 3장의 카드를 뒷면이 보이는 상태로 받습니다.
-<img src="https://user-images.githubusercontent.com/49023743/124744825-1c503000-df5a-11eb-9a60-6a02722e3611.PNG">
+<img src="https://user-images.githubusercontent.com/49023743/124744825-1c503000-df5a-11eb-9a60-6a02722e3611.PNG" width = "300" height ="300">
 3. 모든 플레이어들은 3장의 카드 중 단 한장의 카드 숫자를 본인만 확인합니다.
 <img src="https://user-images.githubusercontent.com/49023743/124744964-3b4ec200-df5a-11eb-82f9-9ae58b491ded.PNG">
 5. 카드 확인이 끝난 후 다시 뒤집어 3장의 카드 배치를 합니다. (제한 시간 10초)
