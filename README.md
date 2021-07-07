@@ -36,7 +36,7 @@ https://drive.google.com/file/d/1drk6DCHn2IxOLA856QMRX5a4ONlqXK0M/view?usp=shari
 11. 조커 카드 2장 왼쪽 과 오른쪽 위치 : 카드 3장의 합산 결과는 0으로 취급합니다.  
 12. 조커 카드 2장 왼쪽 또는 오른쪽 + 가운데 위치 : 남은 카드의 숫자 * 숫자  
 13. 벌금 : 조커 카드를 소지하고 Die를 하게 된다면 기본 판돈의 * 2 만큼 베팅 금액을 지불하게 됩니다.  
-<img src="https://github.com/oh-bba-ya/Plus_Minus_PM/issues/2#issue-938744433.PNG"> 
+<img src="https://user-images.githubusercontent.com/49023743/124744763-0d697d80-df5a-11eb-8475-0b65e7938122.PNG"> 
 
 
 ### (4) 게임 방법 (순서)
