@@ -1,6 +1,6 @@
 # 덧뺄
 
-## Video
+## Video , 실행파일
 https://drive.google.com/file/d/1drk6DCHn2IxOLA856QMRX5a4ONlqXK0M/view?usp=sharing  
 
 
@@ -48,4 +48,5 @@ https://drive.google.com/file/d/1drk6DCHn2IxOLA856QMRX5a4ONlqXK0M/view?usp=shari
 8. 베팅 종료 후 오른쪽 카드를 공개합니다. ( 죽은 플레이어들도 카드를 확인한 후 조커가 있다면 벌금을 지불하고 죽습니다.)
 9. 카드 규칙에 따른 합산 결과를 토대로 제일 높은 숫자를 가지고 있는 플레이어가 승리하게 됩니다.
 
-
+### (5) 게임 실행 방법
+1. 5명의 인원으로 게임을 진행해야한다. 
