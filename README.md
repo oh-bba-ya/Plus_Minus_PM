@@ -39,27 +39,30 @@ https://drive.google.com/file/d/1drk6DCHn2IxOLA856QMRX5a4ONlqXK0M/view?usp=shari
 <img src="https://user-images.githubusercontent.com/49023743/124744763-0d697d80-df5a-11eb-8475-0b65e7938122.PNG"> 
 
 
-### (4) 게임 방법 (순서)
+### (4) 게임 방법 (순서) - (예시 이미지는 )
 1. 참여한 플레이어들은 3장의 카드를 뒷면이 보이는 상태로 받습니다.
 <img src="https://user-images.githubusercontent.com/49023743/124744825-1c503000-df5a-11eb-9a60-6a02722e3611.PNG" width = "500" height ="300">
 2. 모든 플레이어들은 3장의 카드 중 단 한장의 카드 숫자를 본인만 확인합니다.
 <img src="https://user-images.githubusercontent.com/49023743/124744964-3b4ec200-df5a-11eb-82f9-9ae58b491ded.PNG" width = "500" height ="300">
 3. 카드 확인이 끝난 후 다시 뒤집어 3장의 카드 배치를 합니다. (제한 시간 10초, 마우스로 선택 후 바꾸려는 카드로 Drag)
 <img src="https://user-images.githubusercontent.com/49023743/124746043-6980d180-df5b-11eb-8e86-5a5219c2a2a8.PNG" width = "500" height ="300">
-6. 제한 시간 이후 가운데 카드를 뒤집어 공개합니다.
+4. 제한 시간 이후 가운데 카드를 뒤집어 공개합니다. ( 카드 규칙에 맞춰 + , - , * (으)로 변경됩니다. 단 트리플은 3장의 카드가 오픈 된 후 변경됩니다.) 
+<img src="https://user-images.githubusercontent.com/49023743/124746946-676b4280-df5c-11eb-8082-fbc7fcf29481.PNG" width = "500" height ="300">
+5. 베팅을 시작합니다.
+<img src="https://user-images.githubusercontent.com/49023743/124747023-7baf3f80-df5c-11eb-890c-cef5e8188cfc.PNG" width = "500" height ="300">
+5-1 베팅 버튼을 클릭했다면 동전이 쌓이며 , 베팅 버튼이 비활성화 됩니다.
+<img src="https://user-images.githubusercontent.com/49023743/124747035-7e119980-df5c-11eb-8b09-6c8e2a2f0958.PNG" width = "500" height ="300">
 
-7. 베팅을 시작합니다.
+6. 베팅이 종료 후 왼쪽카드를 공개합니다. (만일 플레이어가 혼자 남았다면 그 플레이어가 승리합니다.)
+<img src="https://user-images.githubusercontent.com/49023743/124747113-91bd0000-df5c-11eb-85b4-f5800700c27a.PNG" width = "500" height ="300">
 
-8. 베팅이 종료 후 왼쪽카드를 공개합니다. (만일 플레이어가 혼자 남았다면 그 플레이어가 승리합니다.)
+7. 베팅을 시작합니다. (5번의 순서와 동일하게 실행됩니다.)
 
+8. 베팅 종료 후 오른쪽 카드를 공개합니다. ( 죽은 플레이어들도 카드를 확인한 후 조커가 있다면 벌금을 지불하고 죽습니다.)
+<img src="https://user-images.githubusercontent.com/49023743/124747147-9e415880-df5c-11eb-8779-f2f78a22876d.PNG" width = "500" height ="300">
 
-9. 베팅을 시작합니다.
-
-
-10. 베팅 종료 후 오른쪽 카드를 공개합니다. ( 죽은 플레이어들도 카드를 확인한 후 조커가 있다면 벌금을 지불하고 죽습니다.)
-
-
-11. 카드 규칙에 따른 합산 결과를 토대로 제일 높은 숫자를 가지고 있는 플레이어가 승리하게 됩니다.
+9. 카드 규칙에 따른 합산 결과를 토대로 제일 높은 숫자를 가지고 있는 플레이어가 승리하게 됩니다.
+<img src="https://user-images.githubusercontent.com/49023743/124747850-5e2ea580-df5d-11eb-94da-16d9a5f81758.PNG" width = "500" height ="300">  
 
 ### (5) 사용된 알고리즘
 1. Shuffle
