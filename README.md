@@ -87,3 +87,6 @@ https://drive.google.com/file/d/1drk6DCHn2IxOLA856QMRX5a4ONlqXK0M/view?usp=shari
 
 ## 3. 프로젝트를 진행하며 느낀 점
 팀원을 모집하는 과정이 길었지만 그래도 디자인, 서버 , 클라이언트 파트를 나누어 게임을 개발하면서 각 파트의 중요성과 게임에 적용하기 위해 연계 과정도 여러번의 회의가 필요하다는 것을 알게 되었습니다. 또한 개발 측면으로서 처음 멀티게임을 만들기 시작하며 서버와의 연결방법과 클라이언트에서 해야하는 것들을 알 수 있었습니다. 
+
+## Socket.IO Library
+https://github.com/nhn/socket.io-client-unity3d
